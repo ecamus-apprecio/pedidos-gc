@@ -2,56 +2,130 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Pedido de Gift Cards</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Formulario de Pedido de Gift Cards - Apprecio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
   <style>
+    :root {
+      --primary: #fa345e;
+      --secondary: #b2a8e7ff;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      max-width: 800px;
-      margin: auto;
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
     }
-    .gift-card-group {
-      border: 1px solid #ddd;
-      padding: 12px;
+
+    .container {
+      max-width: 700px;
+      margin: 40px auto;
+      background: #ffffff;
+      padding: 32px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .header img {
+      width: 160px;
       margin-bottom: 12px;
-      border-radius: 8px;
     }
+
+    h1 {
+      color: var(--primary);
+      font-size: 24px;
+      margin-bottom: 0;
+    }
+
     label {
       display: block;
-      margin-top: 10px;
+      margin-top: 16px;
+      font-weight: 600;
     }
+
     input, select {
       width: 100%;
-      padding: 6px;
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      box-sizing: border-box;
     }
+
+    .giftcard-group {
+      padding: 16px;
+      border: 1px solid var(--secondary);
+      border-radius: 10px;
+      margin-top: 20px;
+      background-color: #f4f1fc;
+    }
+
     button {
+      margin-top: 24px;
+      padding: 12px 20px;
+      background-color: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #e02c53;
+    }
+
+    .add-button {
+      background-color: var(--secondary);
+      color: #fff;
       margin-top: 16px;
+    }
+
+    .add-button:hover {
+      background-color: #a092d4;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Pedido de Gift Cards</h1>
+  <div class="container">
+    <div class="header">
+      <img src="https://estudios.apprecio.com/hubfs/logos/Apprecio-logo-rojo.png" alt="Apprecio Logo" />
+      <h1>Pedido de Gift Cards</h1>
+    </div>
 
-  <form id="gcForm">
-    <label>Razón Social<input name="razon_social" required /></label>
-    <label>ID Tributario<input name="id_tributario" required /></label>
-    <label>Panel<input name="panel" required /></label>
-    <label>OC<input name="oc" required /></label>
-    <label>Tipo de pago
-      <select name="tipo_pago" required>
-        <option value="">Selecciona</option>
-        <option value="Contado">Contado</option>
-        <option value="Crédito">Crédito</option>
-      </select>
-    </label>
+    <form id="gcForm">
+      <label>Razón Social<input name="razon_social" required /></label>
+      <label>ID Tributario<input name="id_tributario" required /></label>
+      <label>Panel<input name="panel" required /></label>
+      <label>OC<input name="oc" required /></label>
+      <label>Tipo de pago
+        <select name="tipo_pago" required>
+          <option value="">Selecciona</option>
+          <option value="Crédito">Crédito</option>
+          <option value="Contado">Contado</option>
+        </select>
+      </label>
 
-    <h3>Gift Cards</h3>
-    <div id="giftCards"></div>
-    <button type="button" onclick="addGiftCard()">➕ Agregar Gift Card</button>
+      <div id="giftCards"></div>
+      <button type="button" class="add-button" onclick="addGiftCard()">➕ Agregar Gift Card</button>
 
-    <br><br>
-    <button type="submit">Enviar Pedido</button>
-  </form>
+      <button type="submit">Enviar Pedido</button>
+    </form>
+  </div>
 
   <script>
     const giftCardList = document.getElementById('giftCards');
@@ -59,16 +133,18 @@
 
     function addGiftCard() {
       const container = document.createElement('div');
-      container.className = 'gift-card-group';
+      container.className = 'giftcard-group';
 
       container.innerHTML = `
         <label>Marca
           <select name="giftcards[${counter}][marca]" required>
-            <option value="">Selecciona</option>
+            <option value="">Selecciona una marca</option>
             <option value="FALABELLA">FALABELLA</option>
             <option value="EXITO">EXITO</option>
             <option value="STARBUCKS">STARBUCKS</option>
-            <!-- Agrega más marcas aquí -->
+            <option value="NETFLIX">NETFLIX</option>
+            <option value="XBOX">XBOX</option>
+            <!-- Agrega más marcas si deseas -->
           </select>
         </label>
         <label>Fuente <input name="giftcards[${counter}][fuente]" required /></label>
@@ -79,8 +155,7 @@
       giftCardList.appendChild(container);
     }
 
-    // Agrega al menos una línea
-    addGiftCard();
+    addGiftCard(); // Añadir una gift card al inicio
 
     document.getElementById('gcForm').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -103,22 +178,23 @@
         }
       }
 
-      const res = await fetch("https://n8n.openip.cl/form/pedidosGC", {
+      const res = await fetch("https://n8n.openip.cl/webhook-test/pedidos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
 
       if (res.ok) {
-        alert("Pedido enviado con éxito ✅");
+        alert("✅ Pedido enviado correctamente.");
         form.reset();
         giftCardList.innerHTML = "";
         counter = 0;
         addGiftCard();
       } else {
-        alert("Error al enviar el formulario.");
+        alert("❌ Hubo un error al enviar el pedido.");
       }
     });
   </script>
 </body>
 </html>
+
