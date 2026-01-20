@@ -1,97 +1,90 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Formulario de Pedido Apprecio</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulario Pedido GC</title>
   <style>
     body {
-      font-family: 'Montserrat', sans-serif;
+      font-family: Arial, sans-serif;
       background-color: #f9f9f9;
-      padding: 20px;
       color: #333;
+      margin: 0;
+      padding: 0;
     }
-
     .container {
       max-width: 800px;
-      margin: auto;
+      margin: 40px auto;
       background-color: #fff;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 20px 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
-
-    h1 {
+    h2 {
       text-align: center;
       color: #fa345e;
     }
-
     label {
       display: block;
-      margin-top: 15px;
-      font-weight: 600;
+      margin-top: 16px;
+      font-weight: bold;
     }
-
-    input, select, button {
+    select, input[type="text"], input[type="number"], input[type="file"] {
       width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 6px;
+      padding: 8px;
+      margin-top: 6px;
       border: 1px solid #ccc;
-      font-family: 'Montserrat', sans-serif;
+      border-radius: 4px;
+      box-sizing: border-box;
     }
-
-    select {
-      background-color: #fff4f5;
+    .giftcard-group {
+      border: 1px solid #ddd;
+      padding: 16px;
+      margin-top: 16px;
+      border-radius: 6px;
+      background: #f5f5f5;
     }
-
-    button {
-      background-color: #fa345e;
+    .add-btn {
+      margin-top: 16px;
+      padding: 10px 20px;
+      background-color: #fba1b0;
       color: white;
       border: none;
-      margin-top: 20px;
+      border-radius: 4px;
       cursor: pointer;
     }
-
-    button:hover {
-      background-color: #e32f50;
+    .add-btn:hover {
+      background-color: #fa345e;
     }
-
-    .giftcard-group {
-      border: 1px solid #eee;
-      padding: 15px;
-      margin-top: 20px;
-      border-radius: 8px;
-      background-color: #fdfdfd;
+    button[type="submit"] {
+      margin-top: 24px;
+      background-color: #b2a8e7ff;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
     }
-
-    .giftcard-group h3 {
-      margin-top: 0;
-      color: #b2a8e7ff;
+    button[type="submit"]:hover {
+      background-color: #998bd4;
     }
-
-    .remove-btn {
-      background-color: #ccc;
-      margin-top: 10px;
-    }
-
-    .logo {
+    img.logo {
       display: block;
       margin: 0 auto 20px;
-      width: 180px;
+      max-width: 180px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <img src="https://estudios.apprecio.com/hubfs/logos/Apprecio-logo-rojo.png" alt="Apprecio Logo" class="logo">
-    <h1>Formulario de Pedido de Gift Cards</h1>
+    <img class="logo" src="https://estudios.apprecio.com/hubfs/logos/Apprecio-logo-rojo.png" alt="Logo Apprecio">
+    <h2>Formulario de Pedido Gift Cards</h2>
 
-    <form id="pedidoForm">
+    <form>
       <label for="pais">País</label>
-      <select id="pais" name="pais" required>
-        <option value="">Selecciona un país</option>
+      <select id="pais" name="pais" onchange="actualizarMarcas()">
+        <option value="">Seleccione país</option>
         <option value="colombia">Colombia</option>
         <option value="chile">Chile</option>
         <option value="peru">Perú</option>
@@ -99,77 +92,102 @@
       </select>
 
       <label for="razon">Razón Social</label>
-      <input type="text" name="razon" required>
+      <input type="text" id="razon" name="razon">
 
-      <label for="idTributario">ID TRIBUTARIO</label>
-      <input type="text" name="idTributario" required>
+      <label for="tributario">ID TRIBUTARIO</label>
+      <input type="text" id="tributario" name="tributario">
 
       <label for="panel">Panel</label>
-      <input type="text" name="panel" required>
+      <input type="text" id="panel" name="panel">
 
       <label for="credito">Crédito / Contado</label>
-      <input type="text" name="credito" required>
+      <select id="credito" name="credito">
+        <option value="">Seleccione</option>
+        <option value="Crédito">Crédito</option>
+        <option value="Contado">Contado</option>
+      </select>
 
       <label for="oc">OC</label>
-      <input type="text" name="oc" required>
+      <input type="text" id="oc" name="oc">
 
-      <div id="giftcardContainer">
-        <!-- Gift card blocks se agregan aquí -->
+      <div id="giftcard-list">
+        <!-- Gift Card item -->
+        <div class="giftcard-group">
+          <label>Marca</label>
+          <select class="marca-select" name="marca[]"></select>
+
+          <label>Monto de GC</label>
+          <input type="number" name="monto[]">
+
+          <label>Cantidad</label>
+          <input type="number" name="cantidad[]">
+
+          <label>Fuente</label>
+          <select name="fuente[]">
+            <option value="Catálogo">Catálogo</option>
+            <option value="Proveedor">Proveedor</option>
+          </select>
+        </div>
       </div>
 
-      <button type="button" onclick="agregarGiftCard()">+ Agregar Gift Card</button>
+      <button type="button" class="add-btn" onclick="agregarGiftCard()">+ Agregar otra gift card</button>
 
-      <label for="archivo">Adjuntar archivo (OC o respaldo)</label>
-      <input type="file" name="archivo">
+      <label for="archivo">Adjuntar archivo</label>
+      <input type="file" id="archivo" name="archivo">
 
       <button type="submit">Enviar Pedido</button>
     </form>
   </div>
 
   <script>
-    const marcas = {
-      colombia: ["FALABELLA", "CREPESWAFFLES", "CENCOSUD", "CARULLA", "EXITO", "SUPERINTER"], // truncado por brevedad
-      chile: ["PARIS-JOHNSON", "EASY-JUMBO", "CENCOSUD FISICAS", "FALABELLA"],
-      peru: ["METRO-WONG", "DB_VALECORP11", "DD_VALECORP16"],
-      mexico: ["H&M", "AMAZON", "AMAZON_PRIME"]
+    const marcasPorPais = {
+      colombia: ["FALABELLA", "CREPESWAFFLES", "CENCOSUD", "CARULLA", "EXITO", "SUPERINTER", "SURTIMAX", "LAIKA", "PPGANGA_VIRTUAL", "PPGANGA_DIGITAL", "SPOTIFY_MENSUAL", "SPOTIFY_3M", "XBOX_MENSUAL", "XBOX_3M", "POPSY", "FRISBY", "GOYURT", "DD_COMBO3DONUTS", "DD_COMBO6DONUTS", "TANIA", "MIMOS", "KOKORIKO", "TOSTAO", "FRONTERAS", "BABY_FRESH", "GALAX", "GEF", "PUNTO_BLANCO", "SURTIMAYORISTA", "TRAVELDEPOTTN", "TRAVEL_DEPOT_CR", "TRAVEL_DEPOT_HN", "TRAVEL_DEPOT_VN", "TRAVEL_DEPOT_VI", "TRAVEL_DEPOT_RA", "TRAVEL_DEPOT_TO", "PAT_PRIMO", "SEVEN_SEVEN", "ZAPATOCA", "DAFITI", "WAJACA", "IL_FORNO", "STARBUCKS", "ARCHIES", "DOMINOS", "NETFLIX", "FALABELLA_CALZADO", "FALABELLA_VESTUARIO", "LENOS_BROCHETA", "HOME_SENTRY", "DOTACION_EXITO", "COMBUSTIBLE_EXITO", "PASAPORTE_GOLD", "CINEMARK_ENT2D", "CINEMARK_ENT3D", "CINEMARK_COMBO1", "CINEMARK_COMBO2", "CINEMARK_COMBO3", "SCAPE", "ALIMENTACION_EXITO", "SPRING_STEP", "POPSY_1BOLA", "POPSY_MAXICONO", "POPSY_MALTEADA", "WINGZ", "INKANTA", "CRUZ_VERDE", "TOTTO", "DECATHLON", "EL_CORRAL", "UBER_RIDE", "OLIMPICA", "HOME_CENTER", "POPSY_1LHELADO", "CASA_IDEAS", "NEW_BALANCE", "KOAJ", "SURTITODO", "ROYAL_FILMS_E3D", "ROYAL_FILMS_E2D", "ROYAL_FILMS_COMIDA", "ARA", "ISIMO", "ROYAL_FILMS_COMIDA2", "TERPEL", "ALKOSTO_KTRONIX", "BR_STATION", "EVOK", "CORRAL_GOURMET", "MAKRO", "UB_LEVIS", "BURGER_KING", "PRESTO_GC", "OMA_GC", "CABIFY_GC", "PARKING_15", "ARA_MP_COMISION", "BUFFALO_WINGS", "FALABELLA_CASHBACK", "TRAVEL_DEPOT_HI", "ARA_MARKETPLACE", "UB_DESIGUAL", "UB_WISEMAN", "PARKING_30", "PARKING_60"],
+      chile: ["PARIS-JOHNSON", "EASY-JUMBO", "CENCOSUD FISICAS", "FALABELLA", "TOTTUS", "RIPLEY", "SMU", "CINEMARK_COMBO", "CINEMARK_ENTRADA", "DAFITI", "ATRÁPALO", "ATRAPALO_CL", "RECARGAENLINEA", "CASA IDEAS", "VARSOVIENNE", "CASANOVA", "BIFROST", "SCAPE", "VIDRIOS_PATENTE", "VANDINE", "E_WINE", "FARMEX", "SMARTRIP", "LENS", "VIVE_6M", "VIVE_12M", "VIVE_TM_6M", "VIVE_TM_12M", "CLUBFERRETEROS", "BUIN_ZOO_GENERAL", "HASBRO", "FC24_520_POINTS", "FC24_1.070_POINTS", "FC24_2.200_POINTS", "FC24_5.750_POINTS", "ORIGINAL PENGUIN", "FLORSHEIM", "PERRY ELLIS", "CANADIENNE", "BOSS", "TRIAL", "HAPPYLAND", "CINEPOLIS_ENT2D", "CINEPOLIS_SNACK_MED", "MICROSOFT_365_PERSONAL", "BOX_BLEND", "BOX_EL_GOURMET", "BOX_SABORES", "MICLUBLIDER", "UBER", "UBER_EATS", "PROTEMAX", "ONEILL", "AIRLIFE", "CLUBDELABARBA", "KIDZANIA", "LABARRA", "LABODEGA", "COPEC_PROMO"],
+      peru: ["METRO-WONG", "DB_VALECORP11", "DD_VALECORP16", "CW_VALECORP3", "PP_VALECORP02", "PP_VALECORP14", "PJ_VALECORP3", "PJ_VALECORP13 (Reemplaza VALECORP4)", "BEM_VALECORP25", "BEM_VALECORP20", "TAILOY", "CONECTA_RETAIL", "CINEPLANET", "CINEPLANETCOMBO1", "RIPLEY", "SB_VALECORP01", "SB_VALECORP06", "SB_VALECORP08", "PH_VALECORP6", "PH_VALECORP02", "KFC_VALECORP8", "KFC_VALECORP03", "KFC_VALECORP2", "KFC_VALECORP4", "KFC_VALECORP5", "KFC_VALECORP6", "PB_VALECORP01", "PB_VALECORP05", "BK_VALECORP11", "RK_VALECORP70", "RK_VALECORP75", "FRIDAYS", "OH! PAY", "ATRÁPALO", "PLAY_STATION", "SAGAFALABELLAHOGAR", "SAGAFALABELLAVESTUARIO", "CRISOL", "Coney Park", "CH_VALECORP01", "CH_VALECORP07", "BIG_BOX", "HOLOS_PLUS", "EDO", "TORTASGABY", "ROSATEL", "CHIFAEXPRESS", "MRSUSHI", "LAIBERICA", "BESTWAY", "NATGEO", "TIENDADELHINCHA", "ALERTA_MEDICA"],
+      mexico: ["H&M", "AMAZON", "AMAZON_PRIME", "SPOTIFY_1M", "SPOTIFY_3M", "SPOTIFY_6M", "SPOTIFY_12M", "XBOX_1M", "XBOX_3M", "XBOX_6M", "XBOX_12M", "PLAY_STATION", "CHEDRAUI", "APPLE", "VIX_PREMIUM", "NINTENDO", "ROBLOX", "MINECRAFT_COINS1", "MINECRAFT_COINS2", "LIBRERIAS_GANDHI", "ENVIAFLORES", "GOOGLE_PLAY", "INNOVA_SPORT", "INNVICTUS", "CULTO", "JUSTO", "6_DONAS_GLASEADAS", "6_DONAS_SELECT", "DOCENA_GLASEADA", "DOCENA_SELECT", "LIVERPOOL", "MINA_1M", "MINA_3M", "MINA_12M", "BIGBOX_MOMENTOS", "BIGBOX_BLEND", "BIGBOX_FUSION", "SCAPE_FACIAL_60", "SCAPE_INDV_60", "SCAPE_INDV_90", "SCAPE_PAREJAS_60", "SCAPE_PAREJAS_90", "SCAPE", "SORIANA", "CINEPOLIS_VOUCHER", "SOMNISTORE", "RCI_RESORT", "STARBUCKS", "UBER_RIDER", "UBER_EATS_MX"]
     };
 
-    const container = document.getElementById('giftcardContainer');
-    let index = 0;
+    function actualizarMarcas() {
+      const pais = document.getElementById("pais").value;
+      const marcaSelects = document.querySelectorAll(".marca-select");
+      marcaSelects.forEach(select => actualizarOpcionesDeMarca(select, pais));
+    }
+
+    function actualizarOpcionesDeMarca(select, pais) {
+      select.innerHTML = "";
+      const opciones = marcasPorPais[pais] || [];
+      opciones.forEach(marca => {
+        const option = document.createElement("option");
+        option.value = marca;
+        option.textContent = marca;
+        select.appendChild(option);
+      });
+    }
 
     function agregarGiftCard() {
-      const pais = document.getElementById('pais').value;
-      if (!pais) return alert('Primero selecciona un país');
-
-      const group = document.createElement('div');
-      group.classList.add('giftcard-group');
-      group.innerHTML = `
-        <h3>Gift Card #${index + 1}</h3>
+      const pais = document.getElementById("pais").value;
+      const div = document.createElement("div");
+      div.className = "giftcard-group";
+      div.innerHTML = `
         <label>Marca</label>
-        <select name="marca_${index}" required>
-          ${marcas[pais].map(m => `<option value="${m}">${m}</option>`).join('')}
-        </select>
-
+        <select class="marca-select" name="marca[]"></select>
+        <label>Monto de GC</label>
+        <input type="number" name="monto[]">
+        <label>Cantidad</label>
+        <input type="number" name="cantidad[]">
         <label>Fuente</label>
-        <select name="fuente_${index}" required>
+        <select name="fuente[]">
           <option value="Catálogo">Catálogo</option>
           <option value="Proveedor">Proveedor</option>
         </select>
-
-        <label>Monto de GC</label>
-        <input type="number" name="monto_${index}" required>
-
-        <label>Cantidad</label>
-        <input type="number" name="cantidad_${index}" required>
-
-        <button type="button" class="remove-btn" onclick="this.parentElement.remove()">Eliminar</button>
       `;
-      container.appendChild(group);
-      index++;
+      document.getElementById("giftcard-list").appendChild(div);
+      actualizarOpcionesDeMarca(div.querySelector(".marca-select"), pais);
     }
   </script>
 </body>
 </html>
+
 
 
 
