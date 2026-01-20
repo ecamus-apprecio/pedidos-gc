@@ -84,8 +84,9 @@
     <h1>Pedido Gift Cards</h1>
 
     <form id="giftCardForm">
+
       <label for="pais">País</label>
-      <select id="pais" name="pais" required onchange="updateMarcas()">
+      <select id="pais" name="pais" required>
         <option value="">Selecciona un país</option>
         <option value="colombia">Colombia</option>
         <option value="chile">Chile</option>
@@ -125,16 +126,16 @@
 
   <script>
     const marcasPorPais = {
-      colombia: ["FALABELLA", "CREPESWAFFLES", "CENCOSUD", "CARULLA"],
-      chile: ["PARIS-JOHNSON", "EASY-JUMBO", "FALABELLA"],
-      peru: ["METRO-WONG", "RIPLEY", "CINEPLANET"],
-      mexico: ["H&M", "AMAZON", "XBOX_3M"]
+      colombia: ["FALABELLA", "CREPESWAFFLES", "CENCOSUD", "CARULLA", "EXITO", "SUPERINTER"],
+      chile: ["PARIS-JOHNSON", "EASY-JUMBO", "FALABELLA", "DAFITI"],
+      peru: ["METRO-WONG", "RIPLEY", "CINEPLANET", "PJ_VALECORP13"],
+      mexico: ["H&M", "AMAZON", "XBOX_3M", "LIVERPOOL"]
     };
 
     function updateMarcas() {
       const pais = document.getElementById("pais").value;
       document.querySelectorAll('.marca-select').forEach(select => {
-        select.innerHTML = marcasPorPais[pais]?.map(m => `<option value="${m}">${m}</option>`).join('') || '';
+        select.innerHTML = (marcasPorPais[pais] || []).map(m => `<option value="${m}">${m}</option>`).join('');
       });
     }
 
@@ -170,12 +171,16 @@
       document.getElementById("giftCardFields").appendChild(wrapper);
     }
 
-    window.onload = () => {
-      addGiftCardGroup();
-    };
+    document.getElementById("pais").addEventListener("change", () => {
+      // Solo agregar una gift card si no hay ninguna aún
+      const existing = document.querySelectorAll(".gift-card-group").length;
+      if (existing === 0) addGiftCardGroup();
+      updateMarcas();
+    });
   </script>
 </body>
 </html>
+
 
 
 
