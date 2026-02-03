@@ -82,6 +82,17 @@
       width: 100%;
       margin-top: 10px;
     }
+
+    .warning {
+      margin-top: 8px;
+      padding: 10px;
+      background-color: #fff3cd;
+      border: 1px solid #ffeeba;
+      color: #856404;
+      border-radius: 6px;
+      font-size: 13px;
+      display: none;
+    }
   </style>
 </head>
 
@@ -125,11 +136,11 @@
       <input type="text" name="sucursal" />
 
       <label>Tipo de Gift Card</label>
-<select name="tipoGiftCard" required>
-  <option value="">Selecciona</option>
-  <option value="PDF">Gift card PDF</option>
-  <option value="Delivery">Gift card Delivery</option>
-</select>
+      <select name="tipoGiftCard" required>
+        <option value="">Selecciona</option>
+        <option value="PDF">Gift card PDF</option>
+        <option value="Delivery">Gift card Delivery</option>
+      </select>
 
       <label>Comentarios</label>
       <textarea name="comentarios"></textarea>
@@ -171,13 +182,18 @@ function addGiftCardGroup() {
     <input type="text" class="stock-input" readonly />
 
     <label>Fuente</label>
-    <select name="fuente[]" required>
+    <select class="fuente-select" name="fuente[]" required>
       <option value="Catálogo">Catálogo</option>
       <option value="Proveedor">Proveedor</option>
     </select>
 
     <label>Cantidad</label>
-    <input type="number" name="cantidad[]" min="1" required />
+    <input type="number" class="cantidad-input" name="cantidad[]" min="1" required />
+
+    <div class="warning">
+      ⚠️ Esta solicitud dejará el stock de esta gift card en 45% o menos.
+      Considera validar antes de continuar.
+    </div>
   `;
 
   document.getElementById("giftCardFields").appendChild(wrapper);
@@ -185,17 +201,51 @@ function addGiftCardGroup() {
   const giftSelect = wrapper.querySelector(".giftcard-select");
   const montoSelect = wrapper.querySelector(".monto-select");
   const stockInput = wrapper.querySelector(".stock-input");
+  const fuenteSelect = wrapper.querySelector(".fuente-select");
+  const cantidadInput = wrapper.querySelector(".cantidad-input");
+  const warningBox = wrapper.querySelector(".warning");
 
   cargarGiftCards(giftSelect);
 
   giftSelect.addEventListener("change", e => {
     cargarMontos(montoSelect, stockInput, e.target.value);
+    warningBox.style.display = "none";
   });
 
   montoSelect.addEventListener("change", e => {
     const opt = e.target.selectedOptions[0];
-    stockInput.value = opt ? opt.dataset.stock : "";
+    const stock = opt ? Number(opt.dataset.stock) : 0;
+    stockInput.value = stock;
+    stockInput.dataset.original = stock;
+    warningBox.style.display = "none";
   });
+
+  function evaluarWarning() {
+    const fuente = fuenteSelect.value;
+    const cantidad = Number(cantidadInput.value);
+    const stockOriginal = Number(stockInput.dataset.original);
+
+    if (
+      fuente !== "Catálogo" ||
+      !stockOriginal ||
+      !cantidad
+    ) {
+      warningBox.style.display = "none";
+      return;
+    }
+
+    const restante = stockOriginal - cantidad;
+    const porcentajeRestante = restante / stockOriginal;
+
+    if (porcentajeRestante <= 0.45) {
+      warningBox.style.display = "block";
+    } else {
+      warningBox.style.display = "none";
+    }
+  }
+
+  fuenteSelect.addEventListener("change", evaluarWarning);
+  cantidadInput.addEventListener("input", evaluarWarning);
 }
 
 async function cargarGiftCards(select) {
@@ -211,21 +261,25 @@ async function cargarGiftCards(select) {
 }
 
 async function cargarMontos(selectMonto, stockInput, giftCard) {
+  selectMonto.innerHTML = `<option value="">Selecciona monto</option>`;
+  stockInput.value = "";
+  stockInput.dataset.original = "";
+
+  if (!giftCard) return;
+
   const pais = document.getElementById("pais").value;
   const res = await fetch(
     `${API_URL}?pais=${pais}&giftCard=${encodeURIComponent(giftCard)}`
   );
   const data = await res.json();
 
-  selectMonto.innerHTML =
-    `<option value="">Selecciona monto</option>` +
-    data.montos.map(m =>
-      `<option value="${m.monto}" data-stock="${m.stock}">
-        ${m.monto.toLocaleString()} (stock: ${m.stock})
-      </option>`
-    ).join('');
-
-  stockInput.value = "";
+  data.montos.forEach(m => {
+    const opt = document.createElement("option");
+    opt.value = m.monto;
+    opt.dataset.stock = m.stock;
+    opt.textContent = `${m.monto.toLocaleString()} (stock: ${m.stock})`;
+    selectMonto.appendChild(opt);
+  });
 }
 
 document.getElementById("pais").addEventListener("change", () => {
@@ -236,6 +290,7 @@ document.getElementById("pais").addEventListener("change", () => {
 
 </body>
 </html>
+
 
 
 
