@@ -3,60 +3,53 @@
 <head>
   <meta charset="UTF-8" />
   <title>Pedido Gift Cards</title>
+
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
   <style>
     body {
       font-family: 'Montserrat', sans-serif;
       background-color: #f9f9f9;
-      margin: 0;
       padding: 40px 0;
     }
-
     .container {
-      max-width: 600px;
-      background-color: #fff;
+      max-width: 650px;
+      background: #fff;
       margin: auto;
       padding: 40px;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,.1);
     }
-
     .logo {
       display: block;
       margin: 0 auto 20px;
       max-width: 180px;
     }
-
     h1 {
       color: #fa345e;
       text-align: center;
       margin-bottom: 30px;
     }
-
     label {
       display: block;
       margin: 16px 0 6px;
       font-weight: 600;
     }
-
     input, select, textarea {
       width: 100%;
       padding: 10px;
       border: 1px solid #ccc;
       border-radius: 8px;
       font-size: 14px;
-      box-sizing: border-box;
     }
-
     select {
       background-color: #fef2f3;
     }
-
     textarea {
       resize: vertical;
-      min-height: 90px;
+      min-height: 80px;
     }
-
     button {
       background-color: #fa345e;
       color: white;
@@ -67,26 +60,21 @@
       cursor: pointer;
       margin-top: 20px;
     }
-
     .gift-card-group {
       border: 1px solid #eee;
       padding: 20px;
       border-radius: 10px;
       margin-top: 20px;
-      background-color: #fefefe;
+      background: #fefefe;
     }
-
     .add-button {
       background-color: #f8848f;
-      display: block;
       width: 100%;
-      margin-top: 10px;
     }
-
     .warning {
       margin-top: 8px;
       padding: 10px;
-      background-color: #fff3cd;
+      background: #fff3cd;
       border: 1px solid #ffeeba;
       color: #856404;
       border-radius: 6px;
@@ -97,80 +85,87 @@
 </head>
 
 <body>
-  <div class="container">
-    <img src="https://estudios.apprecio.com/hubfs/logos/Apprecio-logo-rojo.png" class="logo" />
-    <h1>Pedido Gift Cards</h1>
+<div class="container">
+  <img src="https://estudios.apprecio.com/hubfs/logos/Apprecio-logo-rojo.png" class="logo" />
+  <h1>Pedido Gift Cards</h1>
 
-    <form id="giftCardForm" method="POST" enctype="multipart/form-data"
-          action="https://n8n.openip.cl/webhook/pedidosgc">
+  <form method="POST" enctype="multipart/form-data"
+        action="https://n8n.openip.cl/webhook/pedidosgc">
 
-      <label>País</label>
-      <select id="pais" name="pais" required>
-        <option value="">Selecciona</option>
-        <option value="Chile">Chile</option>
-        <option value="Colombia">Colombia</option>
-        <option value="Perú">Perú</option>
-        <option value="México">México</option>
-      </select>
+    <label>País</label>
+    <select id="pais" name="pais" required>
+      <option value="">Selecciona</option>
+      <option>Chile</option>
+      <option>Colombia</option>
+      <option>Perú</option>
+      <option>México</option>
+    </select>
 
-      <label>Razón Social</label>
-      <input type="text" name="razon" required />
+    <label>Razón Social</label>
+    <input name="razon" required />
 
-      <label>ID Tributario</label>
-      <input type="text" name="idTributario" required />
+    <label>ID Tributario</label>
+    <input name="idTributario" required />
 
-      <label>Panel</label>
-      <input type="text" name="panel" required />
+    <label>Panel</label>
+    <input name="panel" required />
 
-      <label>Tipo de Pago</label>
-      <select name="tipoPago" required>
-        <option value="">Selecciona</option>
-        <option value="Crédito">Crédito</option>
-        <option value="Contado">Contado</option>
-      </select>
+    <label>Tipo de Pago</label>
+    <select name="tipoPago" required>
+      <option value="">Selecciona</option>
+      <option>Crédito</option>
+      <option>Contado</option>
+    </select>
 
-      <label>OC</label>
-      <input type="text" name="oc" required />
+    <label>OC</label>
+    <input name="oc" required />
 
-      <label>Sucursal</label>
-      <input type="text" name="sucursal" />
+    <label>Sucursal</label>
+    <input name="sucursal" />
 
-      <label>Tipo de Gift Card</label>
-      <select name="tipoGiftCard" required>
-        <option value="">Selecciona</option>
-        <option value="PDF">Gift card PDF</option>
-        <option value="Delivery">Gift card Delivery</option>
-      </select>
+    <label>Tipo de Gift Card</label>
+    <select name="tipoGiftCard" required>
+      <option value="">Selecciona</option>
+      <option value="PDF">Gift card PDF</option>
+      <option value="Delivery">Gift card Delivery</option>
+    </select>
 
-      <label>Comentarios</label>
-      <textarea name="comentarios"></textarea>
+    <label>Comentarios</label>
+    <textarea name="comentarios"></textarea>
 
-      <div id="giftCardFields"></div>
+    <hr>
 
-      <button type="button" class="add-button" onclick="addGiftCardGroup()">
-        ➕ Agregar otra Gift Card
-      </button>
+    <label>Carga masiva de Gift Cards (Excel / CSV)</label>
+    <input type="file" id="bulkUpload" accept=".xlsx,.csv" />
 
-      <label>Adjuntar archivo</label>
-      <input type="file" name="adjunto" />
+    <div id="giftCardFields"></div>
 
-      <button type="submit">Enviar pedido</button>
-    </form>
-  </div>
+    <button type="button" class="add-button" onclick="addGiftCardGroup()">
+      ➕ Agregar Gift Card manual
+    </button>
+
+    <label>Adjuntar archivo</label>
+    <input type="file" name="adjunto" />
+
+    <button type="submit">Enviar pedido</button>
+  </form>
+</div>
 
 <script>
 const API_URL = "https://n8n.openip.cl/webhook/gc-stock";
 
-function addGiftCardGroup() {
+/* =========================
+   CREAR BLOQUE INDIVIDUAL
+========================= */
+function addGiftCardGroup(prefill = {}) {
   const pais = document.getElementById("pais").value;
   if (!pais) {
-    alert("Selecciona un país primero");
+    alert("Selecciona el país primero");
     return;
   }
 
   const wrapper = document.createElement("div");
   wrapper.className = "gift-card-group";
-
   wrapper.innerHTML = `
     <label>Gift Card</label>
     <select class="giftcard-select" name="giftCard[]" required></select>
@@ -179,117 +174,130 @@ function addGiftCardGroup() {
     <select class="monto-select" name="monto[]" required></select>
 
     <label>Stock disponible</label>
-    <input type="text" class="stock-input" readonly />
+    <input class="stock-input" readonly />
 
     <label>Fuente</label>
     <select class="fuente-select" name="fuente[]" required>
-      <option value="Catálogo">Catálogo</option>
-      <option value="Proveedor">Proveedor</option>
+      <option>Catálogo</option>
+      <option>Proveedor</option>
     </select>
 
     <label>Cantidad</label>
     <input type="number" class="cantidad-input" name="cantidad[]" min="1" required />
 
     <div class="warning">
-      ⚠️ Esta solicitud dejará el stock de esta gift card en 45% o menos.
-      Considera validar antes de continuar.
+      ⚠️ Esta solicitud dejará el stock en 45% o menos.
     </div>
   `;
 
   document.getElementById("giftCardFields").appendChild(wrapper);
 
-  const giftSelect = wrapper.querySelector(".giftcard-select");
-  const montoSelect = wrapper.querySelector(".monto-select");
-  const stockInput = wrapper.querySelector(".stock-input");
-  const fuenteSelect = wrapper.querySelector(".fuente-select");
-  const cantidadInput = wrapper.querySelector(".cantidad-input");
-  const warningBox = wrapper.querySelector(".warning");
+  const gift = wrapper.querySelector(".giftcard-select");
+  const monto = wrapper.querySelector(".monto-select");
+  const stock = wrapper.querySelector(".stock-input");
+  const fuente = wrapper.querySelector(".fuente-select");
+  const cantidad = wrapper.querySelector(".cantidad-input");
+  const warning = wrapper.querySelector(".warning");
 
-  cargarGiftCards(giftSelect);
-
-  giftSelect.addEventListener("change", e => {
-    cargarMontos(montoSelect, stockInput, e.target.value);
-    warningBox.style.display = "none";
+  cargarGiftCards(gift).then(() => {
+    if (prefill.giftCard) {
+      gift.value = prefill.giftCard;
+      gift.dispatchEvent(new Event("change"));
+    }
   });
 
-  montoSelect.addEventListener("change", e => {
+  gift.addEventListener("change", async e => {
+    await cargarMontos(monto, stock, e.target.value);
+    if (prefill.monto) {
+      monto.value = prefill.monto;
+      monto.dispatchEvent(new Event("change"));
+    }
+  });
+
+  monto.addEventListener("change", e => {
     const opt = e.target.selectedOptions[0];
-    const stock = opt ? Number(opt.dataset.stock) : 0;
-    stockInput.value = stock;
-    stockInput.dataset.original = stock;
-    warningBox.style.display = "none";
+    const s = opt ? Number(opt.dataset.stock) : 0;
+    stock.value = s;
+    stock.dataset.original = s;
+    evaluar();
   });
 
-  function evaluarWarning() {
-    const fuente = fuenteSelect.value;
-    const cantidad = Number(cantidadInput.value);
-    const stockOriginal = Number(stockInput.dataset.original);
+  if (prefill.cantidad) cantidad.value = prefill.cantidad;
+  if (prefill.fuente) fuente.value = prefill.fuente;
 
-    if (
-      fuente !== "Catálogo" ||
-      !stockOriginal ||
-      !cantidad
-    ) {
-      warningBox.style.display = "none";
+  function evaluar() {
+    const original = Number(stock.dataset.original);
+    const cant = Number(cantidad.value);
+    if (fuente.value !== "Catálogo" || !original || !cant) {
+      warning.style.display = "none";
       return;
     }
-
-    const restante = stockOriginal - cantidad;
-    const porcentajeRestante = restante / stockOriginal;
-
-    if (porcentajeRestante <= 0.45) {
-      warningBox.style.display = "block";
+    if ((original - cant) / original <= 0.45) {
+      warning.style.display = "block";
     } else {
-      warningBox.style.display = "none";
+      warning.style.display = "none";
     }
   }
 
-  fuenteSelect.addEventListener("change", evaluarWarning);
-  cantidadInput.addEventListener("input", evaluarWarning);
+  fuente.addEventListener("change", evaluar);
+  cantidad.addEventListener("input", evaluar);
 }
 
+/* =========================
+   API
+========================= */
 async function cargarGiftCards(select) {
   const pais = document.getElementById("pais").value;
   const res = await fetch(`${API_URL}?pais=${pais}`);
   const data = await res.json();
-
-  select.innerHTML =
-    `<option value="">Selecciona</option>` +
-    data.giftCards.map(gc =>
-      `<option value="${gc}">${gc}</option>`
-    ).join('');
+  select.innerHTML = `<option value="">Selecciona</option>` +
+    data.giftCards.map(g => `<option>${g}</option>`).join('');
 }
 
-async function cargarMontos(selectMonto, stockInput, giftCard) {
-  selectMonto.innerHTML = `<option value="">Selecciona monto</option>`;
-  stockInput.value = "";
-  stockInput.dataset.original = "";
-
+async function cargarMontos(select, stock, giftCard) {
+  select.innerHTML = `<option value="">Selecciona monto</option>`;
+  stock.value = "";
+  stock.dataset.original = "";
   if (!giftCard) return;
 
   const pais = document.getElementById("pais").value;
-  const res = await fetch(
-    `${API_URL}?pais=${pais}&giftCard=${encodeURIComponent(giftCard)}`
-  );
+  const res = await fetch(`${API_URL}?pais=${pais}&giftCard=${encodeURIComponent(giftCard)}`);
   const data = await res.json();
 
   data.montos.forEach(m => {
-    const opt = document.createElement("option");
-    opt.value = m.monto;
-    opt.dataset.stock = m.stock;
-    opt.textContent = `${m.monto.toLocaleString()} (stock: ${m.stock})`;
-    selectMonto.appendChild(opt);
+    const o = document.createElement("option");
+    o.value = m.monto;
+    o.dataset.stock = m.stock;
+    o.textContent = `${m.monto.toLocaleString()} (stock: ${m.stock})`;
+    select.appendChild(o);
   });
 }
 
+/* =========================
+   CARGA MASIVA
+========================= */
+document.getElementById("bulkUpload").addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async evt => {
+    const wb = XLSX.read(evt.target.result, { type: "array" });
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+    for (const r of rows) {
+      addGiftCardGroup(r);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+});
+
 document.getElementById("pais").addEventListener("change", () => {
   document.getElementById("giftCardFields").innerHTML = "";
-  addGiftCardGroup();
 });
 </script>
-
 </body>
 </html>
+
 
 
 
