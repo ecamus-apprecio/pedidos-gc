@@ -186,7 +186,7 @@ function addGiftCardGroup(prefill = {}) {
     <input type="number" class="cantidad-input" name="cantidad[]" min="1" required />
 
     <div class="warning">
-      ⚠️ Esta solicitud dejará el stock en 45% o menos.
+      ⚠️ Esta solicitud dejará el stock en 30% o menos.
     </div>
   `;
 
@@ -232,7 +232,7 @@ function addGiftCardGroup(prefill = {}) {
       warning.style.display = "none";
       return;
     }
-    if ((original - cant) / original <= 0.45) {
+    if ((original - cant) / original <= 0.3) {
       warning.style.display = "block";
     } else {
       warning.style.display = "none";
