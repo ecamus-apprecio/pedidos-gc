@@ -123,6 +123,10 @@ button {
 <label>Sucursal</label>
 <input name="sucursal" />
 
+<!-- NUEVO CAMPO -->
+<label>Correo Ejecutivo Apprecio</label>
+<input type="email" name="correoEjecutivoApprecio" required />
+
 <label>Tipo de Gift Card</label>
 <select name="tipoGiftCard" required>
   <option value="">Selecciona</option>
@@ -147,8 +151,9 @@ button {
 ➕ Agregar Gift Card manual
 </button>
 
-<label>Adjuntar archivo</label>
-<input type="file" name="adjunto" />
+<!-- MODIFICADO PARA MÚLTIPLES ARCHIVOS -->
+<label>Adjuntar archivos</label>
+<input type="file" name="adjunto[]" multiple />
 
 <button type="submit">Enviar pedido</button>
 </form>
@@ -283,9 +288,6 @@ async function cargarMontos(container, stock, giftCard) {
   });
 }
 
-/* =========================
-   CARGA MASIVA
-========================= */
 document.getElementById("bulkUpload").addEventListener("change", e => {
   const file = e.target.files[0];
   if (!file) return;
@@ -307,6 +309,7 @@ document.getElementById("pais").addEventListener("change", () => {
 </script>
 </body>
 </html>
+
 
 
 
