@@ -1,157 +1,157 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Pedido Gift Cards</title>
+<meta charset="UTF-8" />
+<title>Pedido Gift Cards</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
-  <style>
-    body {
-      font-family: 'Montserrat', sans-serif;
-      background-color: #f9f9f9;
-      padding: 40px 0;
-    }
-    .container {
-      max-width: 650px;
-      background: #fff;
-      margin: auto;
-      padding: 40px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,.1);
-    }
-    .logo {
-      display: block;
-      margin: 0 auto 20px;
-      max-width: 180px;
-    }
-    h1 {
-      color: #fa345e;
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    label {
-      display: block;
-      margin: 16px 0 6px;
-      font-weight: 600;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 14px;
-    }
-    select {
-      background-color: #fef2f3;
-    }
-    textarea {
-      resize: vertical;
-      min-height: 80px;
-    }
-    button {
-      background-color: #fa345e;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-      margin-top: 20px;
-    }
-    .gift-card-group {
-      border: 1px solid #eee;
-      padding: 20px;
-      border-radius: 10px;
-      margin-top: 20px;
-      background: #fefefe;
-    }
-    .add-button {
-      background-color: #f8848f;
-      width: 100%;
-    }
-    .warning {
-      margin-top: 8px;
-      padding: 10px;
-      background: #fff3cd;
-      border: 1px solid #ffeeba;
-      color: #856404;
-      border-radius: 6px;
-      font-size: 13px;
-      display: none;
-    }
-  </style>
+<style>
+body {
+  font-family: 'Montserrat', sans-serif;
+  background-color: #f9f9f9;
+  padding: 40px 0;
+}
+.container {
+  max-width: 650px;
+  background: #fff;
+  margin: auto;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.1);
+}
+.logo {
+  display: block;
+  margin: 0 auto 20px;
+  max-width: 180px;
+}
+h1 {
+  color: #fa345e;
+  text-align: center;
+  margin-bottom: 30px;
+}
+label {
+  display: block;
+  margin: 16px 0 6px;
+  font-weight: 600;
+}
+input, select, textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+select {
+  background-color: #fef2f3;
+}
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+button {
+  background-color: #fa345e;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+.gift-card-group {
+  border: 1px solid #eee;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+  background: #fefefe;
+}
+.add-button {
+  background-color: #f8848f;
+  width: 100%;
+}
+.warning {
+  margin-top: 8px;
+  padding: 10px;
+  background: #fff3cd;
+  border: 1px solid #ffeeba;
+  color: #856404;
+  border-radius: 6px;
+  font-size: 13px;
+  display: none;
+}
+</style>
 </head>
 
 <body>
 <div class="container">
-  <img src="https://estudios.apprecio.com/hubfs/logos/Apprecio-logo-rojo.png" class="logo" />
-  <h1>Pedido Gift Cards</h1>
+<img src="https://estudios.apprecio.com/hubfs/logos/Apprecio-logo-rojo.png" class="logo" />
+<h1>Pedido Gift Cards</h1>
 
-  <form method="POST" enctype="multipart/form-data"
-        action="https://n8n.openip.cl/webhook/pedidosgc">
+<form method="POST" enctype="multipart/form-data"
+      action="https://n8n.openip.cl/webhook/pedidosgc">
 
-    <label>País</label>
-    <select id="pais" name="pais" required>
-      <option value="">Selecciona</option>
-      <option>Chile</option>
-      <option>Colombia</option>
-      <option>Perú</option>
-      <option>México</option>
-    </select>
+<label>País</label>
+<select id="pais" name="pais" required>
+  <option value="">Selecciona</option>
+  <option>Chile</option>
+  <option>Colombia</option>
+  <option>Perú</option>
+  <option>México</option>
+</select>
 
-    <label>Razón Social</label>
-    <input name="razon" required />
+<label>Razón Social</label>
+<input name="razon" required />
 
-    <label>ID Tributario</label>
-    <input name="idTributario" required />
+<label>ID Tributario</label>
+<input name="idTributario" required />
 
-    <label>Panel</label>
-    <input name="panel" required />
+<label>Panel</label>
+<input name="panel" required />
 
-    <label>Tipo de Pago</label>
-    <select name="tipoPago" required>
-      <option value="">Selecciona</option>
-      <option>Crédito</option>
-      <option>Contado</option>
-    </select>
+<label>Tipo de Pago</label>
+<select name="tipoPago" required>
+  <option value="">Selecciona</option>
+  <option>Crédito</option>
+  <option>Contado</option>
+</select>
 
-    <label>OC</label>
-    <input name="oc" required />
+<label>OC</label>
+<input name="oc" required />
 
-    <label>Sucursal</label>
-    <input name="sucursal" />
+<label>Sucursal</label>
+<input name="sucursal" />
 
-    <label>Tipo de Gift Card</label>
-    <select name="tipoGiftCard" required>
-      <option value="">Selecciona</option>
-      <option value="PDF">Gift card PDF</option>
-      <option value="Delivery">Gift card Delivery</option>
-    </select>
+<label>Tipo de Gift Card</label>
+<select name="tipoGiftCard" required>
+  <option value="">Selecciona</option>
+  <option value="PDF">Gift card PDF</option>
+  <option value="Delivery">Gift card Delivery</option>
+</select>
 
-    <label>Descuento (%)</label>
-    <input name="descuento" />
+<label>Descuento (%)</label>
+<input name="descuento" />
 
-    <label>Comentarios</label>
-    <textarea name="comentarios"></textarea>
+<label>Comentarios</label>
+<textarea name="comentarios"></textarea>
 
-    <hr>
+<hr>
 
-    <label>Carga masiva de Gift Cards (Excel / CSV)</label>
-    <input type="file" id="bulkUpload" accept=".xlsx,.csv" />
+<label>Carga masiva (Excel / CSV)</label>
+<input type="file" id="bulkUpload" accept=".xlsx,.csv" />
 
-    <div id="giftCardFields"></div>
+<div id="giftCardFields"></div>
 
-    <button type="button" class="add-button" onclick="addGiftCardGroup()">
-      ➕ Agregar Gift Card manual
-    </button>
+<button type="button" class="add-button" onclick="addGiftCardGroup()">
+➕ Agregar Gift Card manual
+</button>
 
-    <label>Adjuntar archivo</label>
-    <input type="file" name="adjunto" />
+<label>Adjuntar archivo</label>
+<input type="file" name="adjunto" />
 
-    <button type="submit">Enviar pedido</button>
-  </form>
+<button type="submit">Enviar pedido</button>
+</form>
 </div>
 
 <script>
@@ -173,17 +173,17 @@ function addGiftCardGroup(prefill = {}) {
     <label>Gift Card</label>
     <select class="giftcard-select" name="giftCard[]" required></select>
 
-    <label>Monto Gift Card</label>
-    <select class="monto-select" name="monto[]" required></select>
-
-    <label>Stock disponible</label>
-    <input class="stock-input" readonly />
-
     <label>Fuente</label>
     <select class="fuente-select" name="fuente[]" required>
       <option>Catálogo</option>
       <option>Proveedor</option>
     </select>
+
+    <label>Monto Gift Card</label>
+    <div class="monto-container"></div>
+
+    <label>Stock disponible</label>
+    <input class="stock-input" readonly />
 
     <label>Cantidad</label>
     <input type="number" class="cantidad-input" name="cantidad[]" min="1" required />
@@ -196,54 +196,55 @@ function addGiftCardGroup(prefill = {}) {
   document.getElementById("giftCardFields").appendChild(wrapper);
 
   const gift = wrapper.querySelector(".giftcard-select");
-  const monto = wrapper.querySelector(".monto-select");
+  const montoContainer = wrapper.querySelector(".monto-container");
   const stock = wrapper.querySelector(".stock-input");
   const fuente = wrapper.querySelector(".fuente-select");
   const cantidad = wrapper.querySelector(".cantidad-input");
   const warning = wrapper.querySelector(".warning");
 
-  cargarGiftCards(gift).then(() => {
-    if (prefill.giftCard) {
-      gift.value = prefill.giftCard;
-      gift.dispatchEvent(new Event("change"));
-    }
-  });
+  cargarGiftCards(gift);
 
   gift.addEventListener("change", async e => {
-    await cargarMontos(monto, stock, e.target.value);
-    if (prefill.monto) {
-      monto.value = prefill.monto;
-      monto.dispatchEvent(new Event("change"));
+    if (fuente.value === "Catálogo") {
+      await cargarMontos(montoContainer, stock, e.target.value);
     }
   });
 
-  monto.addEventListener("change", e => {
-    const opt = e.target.selectedOptions[0];
-    const s = opt ? Number(opt.dataset.stock) : 0;
-    stock.value = s;
-    stock.dataset.original = s;
-    evaluar();
+  fuente.addEventListener("change", async () => {
+    stock.value = "";
+    stock.dataset.original = "";
+    warning.style.display = "none";
+
+    if (fuente.value === "Proveedor") {
+      montoContainer.innerHTML = `
+        <input type="number" name="monto[]" placeholder="Ingresa monto libre" required />
+      `;
+    } else {
+      montoContainer.innerHTML = `<select class="monto-select" name="monto[]" required></select>`;
+      if (gift.value) {
+        await cargarMontos(montoContainer, stock, gift.value);
+      }
+    }
   });
 
-  if (prefill.cantidad) cantidad.value = prefill.cantidad;
-  if (prefill.fuente) fuente.value = prefill.fuente;
+  cantidad.addEventListener("input", () => {
+    if (fuente.value !== "Catálogo") return;
 
-  function evaluar() {
     const original = Number(stock.dataset.original);
     const cant = Number(cantidad.value);
-    if (fuente.value !== "Catálogo" || !original || !cant) {
+    if (!original || !cant) {
       warning.style.display = "none";
       return;
     }
+
     if ((original - cant) / original <= 0.3) {
       warning.style.display = "block";
     } else {
       warning.style.display = "none";
     }
-  }
+  });
 
-  fuente.addEventListener("change", evaluar);
-  cantidad.addEventListener("input", evaluar);
+  fuente.dispatchEvent(new Event("change"));
 }
 
 /* =========================
@@ -257,22 +258,28 @@ async function cargarGiftCards(select) {
     data.giftCards.map(g => `<option>${g}</option>`).join('');
 }
 
-async function cargarMontos(select, stock, giftCard) {
-  select.innerHTML = `<option value="">Selecciona monto</option>`;
-  stock.value = "";
-  stock.dataset.original = "";
-  if (!giftCard) return;
+async function cargarMontos(container, stock, giftCard) {
+  container.innerHTML = `<select class="monto-select" name="monto[]" required></select>`;
+  const select = container.querySelector("select");
 
   const pais = document.getElementById("pais").value;
   const res = await fetch(`${API_URL}?pais=${pais}&giftCard=${encodeURIComponent(giftCard)}`);
   const data = await res.json();
 
+  select.innerHTML = `<option value="">Selecciona monto</option>`;
   data.montos.forEach(m => {
     const o = document.createElement("option");
     o.value = m.monto;
     o.dataset.stock = m.stock;
     o.textContent = `${m.monto.toLocaleString()} (stock: ${m.stock})`;
     select.appendChild(o);
+  });
+
+  select.addEventListener("change", e => {
+    const opt = e.target.selectedOptions[0];
+    const s = opt ? Number(opt.dataset.stock) : 0;
+    stock.value = s;
+    stock.dataset.original = s;
   });
 }
 
@@ -284,7 +291,7 @@ document.getElementById("bulkUpload").addEventListener("change", e => {
   if (!file) return;
 
   const reader = new FileReader();
-  reader.onload = async evt => {
+  reader.onload = evt => {
     const wb = XLSX.read(evt.target.result, { type: "array" });
     const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
     for (const r of rows) {
@@ -300,6 +307,7 @@ document.getElementById("pais").addEventListener("change", () => {
 </script>
 </body>
 </html>
+
 
 
 
