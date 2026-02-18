@@ -410,12 +410,7 @@ function activarBusquedaPanel() {
    EMPRESAS DINÁMICAS POR PAÍS
 ========================= */
 
-document.getElementById("pais").addEventListener("change", async function () {
-
-  const pais = this.value;
-
-  // Mantener limpieza de gift cards existente
-  document.getElementById("giftCardFields").innerHTML = "";
+async function cargarEmpresasPorPais(pais, empresaSeleccionada = null, sucursalSeleccionada = null) {
 
   if (!pais) return;
 
@@ -433,6 +428,43 @@ document.getElementById("pais").addEventListener("change", async function () {
     opt.textContent = emp.nombreEmpresa;
     panelSelect.appendChild(opt);
   });
+
+  activarBusquedaPanel();
+
+  // 🔹 Si estamos en modificar
+  if (empresaSeleccionada) {
+
+    panelTomSelect.setValue(empresaSeleccionada);
+
+    const empresa = empresasCache.find(e => e.nombreEmpresa === empresaSeleccionada);
+
+    if (empresa) {
+
+      document.getElementById("razonSocial").value = empresa.razonSocial || "";
+      document.getElementById("rutEmpresa").value = empresa.rut || "";
+
+      const sucursalSelect = document.getElementById("sucursalSelect");
+      sucursalSelect.innerHTML = '<option value="">Selecciona sucursal</option>';
+
+      (empresa.sucursales || []).forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s.idSucursal;
+        opt.textContent = `${s.nombreSucursal} (${s.idSucursal})`;
+        sucursalSelect.appendChild(opt);
+      });
+
+      if (sucursalSeleccionada) {
+        sucursalSelect.value = sucursalSeleccionada;
+      }
+    }
+  }
+}
+
+// Listener normal cuando usuario cambia país manualmente
+document.getElementById("pais").addEventListener("change", function () {
+  cargarEmpresasPorPais(this.value);
+});
+
 
   // 🔹 Activar buscador
 activarBusquedaPanel();
@@ -500,7 +532,13 @@ async function buscarPedido() {
   // Setear País primero (esto limpia gift cards por el listener)
   const paisVal = head["País"] || head["Pais"] || "";
   document.getElementById("pais").value = paisVal;
-  document.getElementById("pais").dispatchEvent(new Event("change"));
+
+await cargarEmpresasPorPais(
+  paisVal,
+  head["Panel Empresa"],
+  head["Sucursal"]
+);
+
 
   // Rellenar campos cabecera
   document.querySelector('[name="correoEjecutivoApprecio"]').value = head["Correo KAM"] || head["Correo"] || "";
