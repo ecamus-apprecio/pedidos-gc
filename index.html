@@ -93,6 +93,38 @@ button {
   white-space: nowrap;
 }
 .hr { margin: 22px 0; border: none; border-top: 1px solid #eee; }
+  .top-options {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.option-group {
+  flex: 1;
+}
+
+.toggle-group {
+  display: flex;
+  gap: 10px;
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #fa345e;
+  background: white;
+  color: #fa345e;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.toggle-btn.active {
+  background: #fa345e;
+  color: white;
+}
+
 </style>
 </head>
 
@@ -108,10 +140,6 @@ button {
      3) NUEVO: NUEVO / MODIFICAR
 ========================= -->
 <label>Tipo de solicitud</label>
-<select id="modoPedido" required>
-  <option value="nuevo" selected>Nuevo pedido</option>
-  <option value="modificar">Modificar pedido</option>
-</select>
 
 <div id="bloqueModificar" class="hidden">
   <div class="inline-row">
@@ -124,6 +152,38 @@ button {
     </div>
   </div>
 </div>
+  <div class="top-options">
+
+  <!-- ENVÍO -->
+  <div class="option-group">
+    <label>Envío</label>
+    <div class="toggle-group" id="envioToggle">
+      <button type="button" class="toggle-btn active" data-value="Facturacion">
+        Facturación
+      </button>
+      <button type="button" class="toggle-btn" data-value="Operaciones">
+        Operaciones
+      </button>
+    </div>
+    <input type="hidden" name="tipoEnvio" id="tipoEnvio" value="Facturacion">
+  </div>
+
+  <!-- TIPO PEDIDO -->
+  <div class="option-group">
+    <label>Tipo de pedido</label>
+    <div class="toggle-group" id="modoPedidoToggle">
+      <button type="button" class="toggle-btn active" data-value="nuevo">
+        Nuevo
+      </button>
+      <button type="button" class="toggle-btn" data-value="modificar">
+        Modificar
+      </button>
+    </div>
+    <input type="hidden" name="modoPedido" id="modoPedidoHidden" value="nuevo">
+  </div>
+
+</div>
+
 
 <!-- =========================
      1) PRIMER CAMPO: CORREO EJECUTIVO
@@ -249,28 +309,58 @@ function limpiarFormularioCompleto() {
   document.getElementById("idPedido").value = "";
 
   // 6️⃣ Volver modo a Nuevo
-  document.getElementById("modoPedido").value = "nuevo";
+  // Resetear botones toggle a Nuevo
+document.getElementById("modoPedidoHidden").value = "nuevo";
+
+const botonesModo = document.querySelectorAll("#modoPedidoToggle .toggle-btn");
+botonesModo.forEach(b => b.classList.remove("active"));
+botonesModo[0].classList.add("active");
+
 
 }
 
-
-
-/* =========================
-   3) MODO NUEVO / MODIFICAR
+  /* =========================
+   TOGGLES SUPERIORES
 ========================= */
-document.getElementById("modoPedido").addEventListener("change", (e) => {
+
+function activarToggle(groupId, hiddenInputId, callback = null) {
+  const group = document.getElementById(groupId);
+  const hiddenInput = document.getElementById(hiddenInputId);
+
+  group.querySelectorAll(".toggle-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+
+      // Quitar active a todos
+      group.querySelectorAll(".toggle-btn").forEach(b => b.classList.remove("active"));
+
+      // Activar actual
+      btn.classList.add("active");
+
+      // Guardar valor
+      hiddenInput.value = btn.dataset.value;
+
+      // Callback opcional (para modificar pedido)
+      if (callback) callback(btn.dataset.value);
+    });
+  });
+}
+
+// ENVÍO
+activarToggle("envioToggle", "tipoEnvio");
+
+// TIPO PEDIDO
+activarToggle("modoPedidoToggle", "modoPedidoHidden", (valor) => {
+
   const bloque = document.getElementById("bloqueModificar");
 
-  if (e.target.value === "modificar") {
+  if (valor === "modificar") {
     bloque.classList.remove("hidden");
   } else {
     bloque.classList.add("hidden");
-
-    // 🔹 Solo limpiar si vuelve a Nuevo pedido
     limpiarFormularioCompleto();
   }
-});
 
+});
 
 
 /* =========================
