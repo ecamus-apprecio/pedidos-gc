@@ -223,18 +223,37 @@ function getAny(row, keys) {
   return undefined;
 }
 
+  function limpiarFormularioCompleto() {
+
+  // Resetear todos los campos del formulario
+  const form = document.querySelector("form");
+  form.reset();
+
+  // Limpiar bloques dinámicos de gift cards
+  document.getElementById("giftCardFields").innerHTML = "";
+
+  // Limpiar ID Pedido manualmente
+  document.getElementById("idPedido").value = "";
+}
+
+
 /* =========================
    3) MODO NUEVO / MODIFICAR
 ========================= */
 document.getElementById("modoPedido").addEventListener("change", (e) => {
   const bloque = document.getElementById("bloqueModificar");
+
   if (e.target.value === "modificar") {
     bloque.classList.remove("hidden");
   } else {
     bloque.classList.add("hidden");
-    document.getElementById("idPedido").value = "";
+
+    // 🔹 Solo limpiar si vuelve a Nuevo pedido
+    limpiarFormularioCompleto();
   }
 });
+
+
 
 /* =========================
    BUSCAR PEDIDO (MODIFICAR)
