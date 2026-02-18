@@ -506,21 +506,22 @@ async function buscarPedido() {
   document.querySelector('[name="correoEjecutivoApprecio"]').value = head["Correo KAM"] || head["Correo"] || "";
   document.querySelector('[name="razon"]').value = head["Razón Social"] || head["Razon Social"] || "";
   document.querySelector('[name="idTributario"]').value = head["ID Tributario"] || head["ID tributario"] || head["Id Tributario"] || "";
-  document.querySelector('[name="panel"]').value = head["Panel"] || "";
+  document.querySelector('[name="panel"]').value = head["Panel Empresa"] || "";
   document.querySelector('[name="tipoPago"]').value = head["Tipo de Pago"] || "";
   document.querySelector('[name="oc"]').value = head["OC"] || "";
   document.querySelector('[name="sucursal"]').value = head["Sucursal"] || "";
   document.querySelector('[name="tipoGiftCard"]').value = head["Tipo de Gift card"] || head["Tipo de Gift Card"] || "";
   document.querySelector('[name="descuento"]').value = head["Descuento"] || "";
   document.querySelector('[name="comentarios"]').value = head["Comentarios"] || "";
+  document.querySelector('[name="giftCardFisica"]').value = head["GC Fisica"] || "No";
 
   // Cargar gift cards desde filas (un ID Pedido puede tener varias)
   for (const r of rows) {
     await addGiftCardGroup({
       giftCard: r["Gift card"] || r["Gift Card"] || "",
       fuente: r["Fuente"] || "Catálogo",
-      monto: r["Monto"] ?? "",
-      cantidad: r["Cantidad"] ?? 1
+      monto: r["Monto GC"] ?? "",
+      cantidad: r["Cantidad GC"] ?? 1
     });
   }
 
