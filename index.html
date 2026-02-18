@@ -200,14 +200,21 @@ button {
   <option>México</option>
 </select>
 
-  <label>Panel Empresa</label>
-<input name="panel" required />
+<label>Panel Empresa</label>
+<select id="panelEmpresa" name="panel" required>
+  <option value="">Selecciona empresa</option>
+</select>
 
 <label>Razón Social</label>
-<input name="razon" required />
+<input name="razon" id="razonSocial" readonly required />
 
 <label>ID Tributario</label>
-<input name="idTributario" required />
+<input name="idTributario" id="rutEmpresa" readonly required />
+
+  <label>Sucursal</label>
+<select name="sucursal" id="sucursalSelect">
+  <option value="">Selecciona sucursal</option>
+</select>
 
 <label>Tipo de Pago</label>
 <select name="tipoPago" required>
@@ -218,9 +225,6 @@ button {
 
 <label>OC</label>
 <input name="oc" required />
-
-<label>Sucursal</label>
-<input name="sucursal" />
 
 <label>Tipo de Gift Card</label>
 <select name="tipoGiftCard" required>
@@ -266,6 +270,9 @@ button {
 <script>
 const API_URL_STOCK = "https://n8n.openip.cl/webhook/gc-stock";
 const API_URL_PEDIDOS = "https://n8n.openip.cl/webhook/gc-pedidos";
+const API_URL_EMPRESAS = "https://n8n.openip.cl/webhook/empresas";
+let empresasCache = [];
+
 
 /* =========================
    HELPERS (mapeo carga masiva)
@@ -316,6 +323,16 @@ const botonesModo = document.querySelectorAll("#modoPedidoToggle .toggle-btn");
 botonesModo.forEach(b => b.classList.remove("active"));
 botonesModo[0].classList.add("active");
 
+    // Limpiar dropdown empresas
+  document.getElementById("panelEmpresa").innerHTML =
+    '<option value="">Selecciona empresa</option>';
+
+  // Limpiar dropdown sucursales
+  document.getElementById("sucursalSelect").innerHTML =
+    '<option value="">Selecciona sucursal</option>';
+
+  // Limpiar cache
+  empresasCache = [];
 
 }
 
@@ -359,6 +376,66 @@ activarToggle("modoPedidoToggle", "modoPedidoHidden", (valor) => {
     bloque.classList.add("hidden");
     limpiarFormularioCompleto();
   }
+
+});
+
+  /* =========================
+   EMPRESAS DINÁMICAS POR PAÍS
+========================= */
+
+document.getElementById("pais").addEventListener("change", async function () {
+
+  const pais = this.value;
+
+  // Mantener limpieza de gift cards existente
+  document.getElementById("giftCardFields").innerHTML = "";
+
+  if (!pais) return;
+
+  const res = await fetch(`${API_URL_EMPRESAS}?pais=${encodeURIComponent(pais)}`);
+  const data = await res.json();
+
+  empresasCache = data.empresas || [];
+
+  const panelSelect = document.getElementById("panelEmpresa");
+  panelSelect.innerHTML = '<option value="">Selecciona empresa</option>';
+
+  empresasCache.forEach(emp => {
+    const opt = document.createElement("option");
+    opt.value = emp.nombreEmpresa;
+    opt.textContent = emp.nombreEmpresa;
+    panelSelect.appendChild(opt);
+  });
+
+  // Limpiar dependientes
+  document.getElementById("razonSocial").value = "";
+  document.getElementById("rutEmpresa").value = "";
+  document.getElementById("sucursalSelect").innerHTML =
+    '<option value="">Selecciona sucursal</option>';
+});
+
+
+/* =========================
+   AL SELECCIONAR EMPRESA
+========================= */
+
+document.getElementById("panelEmpresa").addEventListener("change", function () {
+
+  const empresa = empresasCache.find(e => e.nombreEmpresa === this.value);
+  if (!empresa) return;
+
+  document.getElementById("razonSocial").value = empresa.razonSocial || "";
+  document.getElementById("rutEmpresa").value = empresa.rut || "";
+
+  const sucursalSelect = document.getElementById("sucursalSelect");
+  sucursalSelect.innerHTML = '<option value="">Selecciona sucursal</option>';
+
+  (empresa.sucursales || []).forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s.idSucursal;
+    opt.textContent = `${s.nombreSucursal} (${s.idSucursal})`;
+    sucursalSelect.appendChild(opt);
+  });
 
 });
 
