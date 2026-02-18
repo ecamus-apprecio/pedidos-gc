@@ -6,6 +6,10 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  
+<link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+
 
 <style>
 body {
@@ -271,7 +275,10 @@ button {
 const API_URL_STOCK = "https://n8n.openip.cl/webhook/gc-stock";
 const API_URL_PEDIDOS = "https://n8n.openip.cl/webhook/gc-pedidos";
 const API_URL_EMPRESAS = "https://n8n.openip.cl/webhook/empresas";
+
 let empresasCache = [];
+let panelTomSelect = null;
+
 
 
 /* =========================
@@ -380,6 +387,26 @@ activarToggle("modoPedidoToggle", "modoPedidoHidden", (valor) => {
 });
 
   /* =========================
+   ACTIVAR BUSCADOR PANEL EMPRESA
+========================= */
+function activarBusquedaPanel() {
+
+  if (panelTomSelect) {
+    panelTomSelect.destroy();
+  }
+
+  panelTomSelect = new TomSelect("#panelEmpresa", {
+    create: false,
+    sortField: {
+      field: "text",
+      direction: "asc"
+    },
+    placeholder: "Escribe para buscar empresa...",
+    allowEmptyOption: true
+  });
+}
+
+  /* =========================
    EMPRESAS DINÁMICAS POR PAÍS
 ========================= */
 
@@ -406,6 +433,9 @@ document.getElementById("pais").addEventListener("change", async function () {
     opt.textContent = emp.nombreEmpresa;
     panelSelect.appendChild(opt);
   });
+
+  // 🔹 Activar buscador
+activarBusquedaPanel();
 
   // Limpiar dependientes
   document.getElementById("razonSocial").value = "";
