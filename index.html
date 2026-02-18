@@ -223,18 +223,36 @@ function getAny(row, keys) {
   return undefined;
 }
 
-  function limpiarFormularioCompleto() {
+function limpiarFormularioCompleto() {
 
-  // Resetear todos los campos del formulario
-  const form = document.querySelector("form");
-  form.reset();
+  // 1️⃣ Limpiar inputs tipo texto, email, number
+  document.querySelectorAll("input").forEach(input => {
+    if (input.type !== "button" && input.type !== "submit" && input.type !== "file") {
+      input.value = "";
+    }
+  });
 
-  // Limpiar bloques dinámicos de gift cards
+  // 2️⃣ Resetear selects
+  document.querySelectorAll("select").forEach(select => {
+    select.selectedIndex = 0;
+  });
+
+  // 3️⃣ Resetear textarea
+  document.querySelectorAll("textarea").forEach(t => {
+    t.value = "";
+  });
+
+  // 4️⃣ Limpiar gift cards dinámicas
   document.getElementById("giftCardFields").innerHTML = "";
 
-  // Limpiar ID Pedido manualmente
+  // 5️⃣ Limpiar ID Pedido
   document.getElementById("idPedido").value = "";
+
+  // 6️⃣ Volver modo a Nuevo
+  document.getElementById("modoPedido").value = "nuevo";
+
 }
+
 
 
 /* =========================
