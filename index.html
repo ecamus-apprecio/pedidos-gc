@@ -457,6 +457,7 @@ async function cargarEmpresasPorPais(pais, empresaSeleccionada = null, sucursalS
 
       document.getElementById("razonSocial").value = empresa.razonSocial || "";
       document.getElementById("rutEmpresa").value = empresa.rut || "";
+      document.getElementById("idPanelHidden").value = empresa.idPanel ?? "";
 
       const sucursalSelect = document.getElementById("sucursalSelect");
       sucursalSelect.innerHTML = '<option value="">Selecciona sucursal</option>';
@@ -494,24 +495,44 @@ document.getElementById("panelEmpresa").addEventListener("change", function () {
   document.getElementById("razonSocial").value = empresa.razonSocial || "";
   document.getElementById("rutEmpresa").value = empresa.rut || "";
 
+  // 🔥 ESTA LÍNEA FALTABA
+  document.getElementById("idPanelHidden").value = empresa.idPanel ?? "";
+
   const sucursalSelect = document.getElementById("sucursalSelect");
   sucursalSelect.innerHTML = '<option value="">Selecciona sucursal</option>';
 
   (empresa.sucursales || []).forEach(s => {
     const opt = document.createElement("option");
     opt.value = s.idSucursal;
-    opt.textContent = `${s.nombreSucursal} (${s.idSucursal})`;
+
+    // 🔥 CASO ESPECIAL SUCURSAL 0
+    if (String(s.idSucursal) === "0") {
+      opt.textContent = "Administrador (0)";
+      opt.dataset.nombre = "Administrador";
+    } else {
+      opt.textContent = `${s.nombreSucursal} (${s.idSucursal})`;
+      opt.dataset.nombre = s.nombreSucursal;
+    }
+
     sucursalSelect.appendChild(opt);
   });
 
 });
 
-  document.getElementById("sucursalSelect").addEventListener("change", function () {
 
-  const selectedOption = this.selectedOptions[0];
+document.getElementById("sucursalSelect").addEventListener("change", function () {
+
+  const selectedOption = this.options[this.selectedIndex];
   if (!selectedOption) return;
 
-  const nombreSucursal = selectedOption.dataset.nombre || "";
+  let nombreSucursal;
+
+  if (this.value === "0") {
+    nombreSucursal = "Administrador";
+  } else {
+    nombreSucursal = selectedOption.dataset.nombre || "";
+  }
+
   document.getElementById("nombreSucursalHidden").value = nombreSucursal;
 
 });
