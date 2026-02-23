@@ -94,6 +94,15 @@ button {
   font-size: 13px;
   display: none;
 }
+  .comentario-warning {
+  margin-top: 8px;
+  padding: 10px;
+  background: #e8f4ff;
+  border: 1px solid #b6e0fe;
+  color: #084298;
+  border-radius: 6px;
+  font-size: 13px;
+}
 .hidden { display:none; }
 .inline-row {
   display:flex;
@@ -643,6 +652,8 @@ async function addGiftCardGroup(prefill = {}) {
     <div class="warning">
       ⚠️ Esta solicitud dejará el stock en 30% o menos.
     </div>
+
+    <div class="comentario-warning hidden"></div>
   `;
 
   document.getElementById("giftCardFields").appendChild(wrapper);
@@ -749,18 +760,38 @@ async function cargarMontos(container, stock, giftCard) {
   container.innerHTML = `<select class="monto-select" name="monto[]" required></select>`;
   const select = container.querySelector("select");
 
+  const wrapper = container.closest(".gift-card-group");
+  const comentarioBox = wrapper.querySelector(".comentario-warning");
+
   const pais = document.getElementById("pais").value;
   const res = await fetch(`${API_URL_STOCK}?pais=${encodeURIComponent(pais)}&giftCard=${encodeURIComponent(giftCard)}`);
   const data = await res.json();
 
   select.innerHTML = `<option value="">Selecciona monto</option>`;
+
+  let comentarioMostrado = null;
+
   (data.montos || []).forEach(m => {
     const o = document.createElement("option");
     o.value = String(m.monto);
     o.dataset.stock = String(m.stock);
     o.textContent = `${Number(m.monto).toLocaleString()} (stock: ${m.stock})`;
     select.appendChild(o);
+
+    // Guardamos comentario si existe
+    if (m.comentario && !comentarioMostrado) {
+      comentarioMostrado = m.comentario;
+    }
   });
+
+  // 🔵 Mostrar comentario si existe
+  if (comentarioMostrado) {
+    comentarioBox.classList.remove("hidden");
+    comentarioBox.innerHTML = `ℹ️ ${comentarioMostrado}`;
+  } else {
+    comentarioBox.classList.add("hidden");
+    comentarioBox.innerHTML = "";
+  }
 
   select.addEventListener("change", e => {
     const opt = e.target.selectedOptions[0];
