@@ -341,10 +341,15 @@ function limpiarFormularioCompleto() {
 
   // 1️⃣ Limpiar inputs tipo texto, email, number
   document.querySelectorAll("input").forEach(input => {
-    if (input.type !== "button" && input.type !== "submit" && input.type !== "file") {
-      input.value = "";
-    }
-  });
+  if (
+    input.type !== "button" &&
+    input.type !== "submit" &&
+    input.type !== "file" &&
+    input.type !== "hidden"   // 🔥 ESTA ES LA CLAVE
+  ) {
+    input.value = "";
+  }
+});
 
   // 2️⃣ Resetear selects
   document.querySelectorAll("select").forEach(select => {
