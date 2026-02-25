@@ -362,7 +362,9 @@ function limpiarFormularioCompleto() {
   // 5️⃣ Limpiar ID Pedido
   document.getElementById("idPedido").value = "";
 
-    // Limpiar dropdown empresas
+  // ✅ NO TOCAR modoPedidoToggle NI modoPedidoHidden AQUÍ
+
+  // Limpiar dropdown empresas
   document.getElementById("panelEmpresa").innerHTML =
     '<option value="">Selecciona empresa</option>';
 
@@ -372,7 +374,6 @@ function limpiarFormularioCompleto() {
 
   // Limpiar cache
   empresasCache = [];
-
 }
 
   function habilitarFormulario(estadoEditable) {
