@@ -607,6 +607,7 @@ await cargarEmpresasPorPais(
   // Cargar gift cards desde filas (un ID Pedido puede tener varias)
   for (const r of rows) {
     await addGiftCardGroup({
+      idInterno: r["ID Interno"] || r["ID interno"] || r["id interno"] || "",
       giftCard: r["Gift card"] || r["Gift Card"] || "",
       fuente: r["Fuente"] || "Catálogo",
       monto: r["Monto GC"] ?? "",
@@ -633,6 +634,9 @@ async function addGiftCardGroup(prefill = {}) {
   wrapper.innerHTML = `
     <label>Gift Card</label>
     <select class="giftcard-select" name="giftCard[]" required></select>
+
+    <label>ID Interno</label>
+<input class="id-interno-input" name="idInterno[]" readonly />
 
     <label>Fuente</label>
     <select class="fuente-select" name="fuente[]" required>
@@ -664,6 +668,28 @@ async function addGiftCardGroup(prefill = {}) {
   const fuente = wrapper.querySelector(".fuente-select");
   const cantidad = wrapper.querySelector(".cantidad-input");
   const warning = wrapper.querySelector(".warning");
+
+
+  // ✅ Prefill ID Interno (para modo modificar)
+const idInternoInput = wrapper.querySelector(".id-interno-input");
+if (idInternoInput) {
+  idInternoInput.value = prefill.idInterno ? String(prefill.idInterno) : "";
+}
+
+  // ✅ Si estamos modificando y no venía ID Interno, lo generamos
+const modo = document.getElementById("modoPedidoHidden")?.value;
+const idPedidoActual = document.getElementById("idPedido")?.value;
+
+if (modo === "modificar" && idPedidoActual && !idInternoInput.value) {
+
+  const existentes = Array.from(
+    document.querySelectorAll('input[name="idInterno[]"]')
+  ).filter(i => i.value); // solo los que ya tienen valor
+
+  const correlativo = existentes.length + 1;
+
+  idInternoInput.value = `${idPedidoActual}_${correlativo}`;
+}
 
   // 1) Cargar gift cards por país
   await cargarGiftCards(gift);
