@@ -376,18 +376,26 @@ function limpiarFormularioCompleto() {
   empresasCache = [];
 }
 
-  function habilitarFormulario(estadoEditable) {
+function habilitarFormulario(estadoEditable) {
 
   const inputs = document.querySelectorAll("input, select, textarea");
 
   inputs.forEach(el => {
 
-    if (el.name === "idPedido") return; // este siempre editable
+    // 🔥 NUNCA deshabilitar estos campos
+    if (
+      el.name === "idPedido" ||
+      el.name === "modoPedido" ||
+      el.name === "tipoEnvio" ||
+      el.name === "idPanel" ||
+      el.name === "nombreSucursal"
+    ) {
+      return;
+    }
 
     if (estadoEditable) {
       el.removeAttribute("disabled");
 
-      // mantener ID Interno readonly
       if (el.classList.contains("id-interno-input")) {
         el.setAttribute("readonly", true);
       }
