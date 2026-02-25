@@ -145,8 +145,15 @@ button {
 }
 
 .toggle-btn.active {
-  background: #fa345e;
-  color: white;
+  background: #fa345e !important;
+  color: white !important;
+  border: 1px solid #fa345e !important;
+}
+
+.toggle-btn {
+  background: white;
+  color: #fa345e;
+  border: 1px solid #fa345e;
 }
 
 </style>
@@ -408,19 +415,20 @@ function activarToggle(groupId, hiddenInputId, callback = null) {
   const group = document.getElementById(groupId);
   const hiddenInput = document.getElementById(hiddenInputId);
 
-  group.querySelectorAll(".toggle-btn").forEach(btn => {
+  const buttons = group.querySelectorAll(".toggle-btn");
+
+  buttons.forEach(btn => {
     btn.addEventListener("click", () => {
 
       // Quitar active a todos
-      group.querySelectorAll(".toggle-btn").forEach(b => b.classList.remove("active"));
+      buttons.forEach(b => b.classList.remove("active"));
 
-      // Activar actual
+      // Agregar active al clickeado
       btn.classList.add("active");
 
       // Guardar valor
       hiddenInput.value = btn.dataset.value;
 
-      // Callback opcional (para modificar pedido)
       if (callback) callback(btn.dataset.value);
     });
   });
