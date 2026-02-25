@@ -362,14 +362,6 @@ function limpiarFormularioCompleto() {
   // 5️⃣ Limpiar ID Pedido
   document.getElementById("idPedido").value = "";
 
-  // 6️⃣ Volver modo a Nuevo
-  // Resetear botones toggle a Nuevo
-document.getElementById("modoPedidoHidden").value = "nuevo";
-
-const botonesModo = document.querySelectorAll("#modoPedidoToggle .toggle-btn");
-botonesModo.forEach(b => b.classList.remove("active"));
-botonesModo[0].classList.add("active");
-
     // Limpiar dropdown empresas
   document.getElementById("panelEmpresa").innerHTML =
     '<option value="">Selecciona empresa</option>';
