@@ -198,14 +198,17 @@ button {
   <!-- TIPO PEDIDO -->
   <div class="option-group">
     <label>Tipo de pedido</label>
-    <div class="toggle-group" id="modoPedidoToggle">
-      <button type="button" class="toggle-btn active" data-value="nuevo">
-        Nuevo
-      </button>
-      <button type="button" class="toggle-btn" data-value="modificar">
-        Modificar
-      </button>
-    </div>
+   <div class="toggle-group" id="modoPedidoToggle">
+  <button type="button" class="toggle-btn active" data-value="nuevo">
+    Nuevo
+  </button>
+  <button type="button" class="toggle-btn" data-value="modificar">
+    Modificar
+  </button>
+  <button type="button" class="toggle-btn" data-value="anular">
+    Anular
+  </button>
+</div>
     <input type="hidden" name="modoPedido" id="modoPedidoHidden" value="nuevo">
   </div>
 
@@ -373,6 +376,30 @@ botonesModo[0].classList.add("active");
 
 }
 
+  function habilitarFormulario(estadoEditable) {
+
+  const inputs = document.querySelectorAll("input, select, textarea");
+
+  inputs.forEach(el => {
+
+    if (el.name === "idPedido") return; // este siempre editable
+
+    if (estadoEditable) {
+      el.removeAttribute("disabled");
+
+      // mantener ID Interno readonly
+      if (el.classList.contains("id-interno-input")) {
+        el.setAttribute("readonly", true);
+      }
+
+    } else {
+      el.setAttribute("disabled", true);
+    }
+
+  });
+
+}
+
   /* =========================
    TOGGLES SUPERIORES
 ========================= */
@@ -406,12 +433,29 @@ activarToggle("envioToggle", "tipoEnvio");
 activarToggle("modoPedidoToggle", "modoPedidoHidden", (valor) => {
 
   const bloque = document.getElementById("bloqueModificar");
+  const submitBtn = document.querySelector('button[type="submit"]');
+  const addBtn = document.querySelector(".add-button");
+
+  limpiarFormularioCompleto();
 
   if (valor === "modificar") {
     bloque.classList.remove("hidden");
-  } else {
+    habilitarFormulario(true);
+    submitBtn.textContent = "Guardar Modificación";
+    addBtn.style.display = "block";
+  }
+
+  else if (valor === "anular") {
+    bloque.classList.remove("hidden");
+    submitBtn.textContent = "Anular Pedido";
+    addBtn.style.display = "none";
+  }
+
+  else {
     bloque.classList.add("hidden");
-    limpiarFormularioCompleto();
+    habilitarFormulario(true);
+    submitBtn.textContent = "Enviar pedido";
+    addBtn.style.display = "block";
   }
 
 });
@@ -615,7 +659,14 @@ await cargarEmpresasPorPais(
     });
   }
 
+  const modoActual = document.getElementById("modoPedidoHidden").value;
+
+if (modoActual === "anular") {
+  habilitarFormulario(false);
+  alert("Pedido cargado. Confirma anulación.");
+} else {
   alert("Pedido cargado. Revisa y ajusta antes de enviar.");
+}
 }
 
 /* =========================
