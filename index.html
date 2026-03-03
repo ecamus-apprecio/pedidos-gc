@@ -250,7 +250,7 @@ button {
 <input name="idTributario" id="rutEmpresa" readonly required />
 
   <label>Sucursal</label>
-<select name="sucursal" id="sucursalSelect">
+<select name="sucursal" id="sucursalSelect" required>
   <option value="">Selecciona sucursal</option>
 </select>
 
@@ -306,7 +306,7 @@ button {
 
 <!-- SE MANTIENE: MÚLTIPLES ARCHIVOS -->
 <label>Adjuntar archivos</label>
-<input type="file" name="adjunto[]" multiple />
+<input type="file" name="adjunto[]" multiple required />
 
 <button type="submit">Enviar pedido</button>
 </form>
