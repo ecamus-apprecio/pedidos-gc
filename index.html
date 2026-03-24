@@ -155,6 +155,19 @@ button {
   color: #fa345e;
   border: 1px solid #fa345e;
 }
+  .delete-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.delete-btn:hover {
+  background-color: #b02a37;
+}
 
 </style>
 </head>
@@ -702,6 +715,9 @@ async function addGiftCardGroup(prefill = {}) {
   const wrapper = document.createElement("div");
   wrapper.className = "gift-card-group";
   wrapper.innerHTML = `
+
+<button type="button" class="delete-btn">🗑 Eliminar</button>
+  
     <label>Gift Card</label>
     <select class="giftcard-select" name="giftCard[]" required></select>
 
@@ -731,6 +747,11 @@ async function addGiftCardGroup(prefill = {}) {
   `;
 
   document.getElementById("giftCardFields").appendChild(wrapper);
+
+  // BOTÓN ELIMINAR
+wrapper.querySelector(".delete-btn").addEventListener("click", () => {
+  wrapper.remove();
+});
 
   const gift = wrapper.querySelector(".giftcard-select");
   const montoContainer = wrapper.querySelector(".monto-container");
