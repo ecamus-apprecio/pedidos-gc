@@ -3,15 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <title>Pedido Gift Cards</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
-
 <!-- Google Identity Services -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-
 <style>
 /* ============================================================
    BASE
@@ -21,7 +18,6 @@ body {
   background-color: #f9f9f9;
   padding: 40px 0;
 }
-
 /* ============================================================
    PANTALLA DE LOGIN
 ============================================================ */
@@ -33,7 +29,6 @@ body {
   background: #f9f9f9;
   padding: 20px;
 }
-
 .login-card {
   background: #fff;
   border-radius: 16px;
@@ -43,29 +38,24 @@ body {
   width: 100%;
   text-align: center;
 }
-
 .login-logo {
   max-width: 160px;
   margin-bottom: 28px;
 }
-
 .login-card h1 {
   color: #fa345e;
   font-size: 22px;
   margin-bottom: 12px;
 }
-
 .login-card p {
   color: #555;
   font-size: 14px;
   margin-bottom: 32px;
   line-height: 1.6;
 }
-
 .login-card p strong {
   color: #222;
 }
-
 /* Botón Google personalizado */
 .google-btn {
   display: flex;
@@ -92,13 +82,11 @@ body {
 .google-btn img {
   width: 22px;
 }
-
 .login-footer {
   font-size: 12px;
   color: #aaa;
   margin-top: 20px;
 }
-
 /* Error de dominio */
 .domain-error {
   display: none;
@@ -110,7 +98,6 @@ body {
   color: #c0392b;
   font-size: 13px;
 }
-
 /* ============================================================
    HEADER DE SESIÓN (aparece sobre el form)
 ============================================================ */
@@ -149,12 +136,10 @@ body {
   margin-top: 0;
 }
 #logoutBtn:hover { background: #fff0f2; }
-
 /* ============================================================
    FORMULARIO (tu CSS original)
 ============================================================ */
 #appScreen { display: none; }
-
 .container {
   max-width: 650px;
   background: #fff;
@@ -219,9 +204,7 @@ button {
 .delete-btn:hover { background-color: #b02a37; }
 </style>
 </head>
-
 <body>
-
 <!-- ============================================================
      PANTALLA LOGIN
 ============================================================ -->
@@ -233,21 +216,17 @@ button {
       Acceso restringido a colaboradores Apprecio.<br>
       Inicia sesión con tu cuenta <strong>@apprecio.com</strong> o <strong>@dcanje.com</strong>
     </p>
-
     <button class="google-btn" onclick="iniciarLoginGoogle()">
       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
       Acceder con Google
     </button>
-
     <div class="domain-error" id="domainError">
       ⛔ Tu cuenta no pertenece a un dominio autorizado.<br>
       Usa tu correo <strong>@apprecio.com</strong> o <strong>@dcanje.com</strong>
     </div>
-
     <p class="login-footer">Sistema interno — uso exclusivo del equipo Apprecio</p>
   </div>
 </div>
-
 <!-- ============================================================
      BARRA DE SESIÓN
 ============================================================ -->
@@ -260,7 +239,6 @@ button {
   </div>
   <button id="logoutBtn" onclick="cerrarSesion()">Cerrar sesión</button>
 </div>
-
 <!-- ============================================================
      FORMULARIO (tu form original intacto)
 ============================================================ -->
@@ -268,13 +246,10 @@ button {
 <div class="container">
   <img src="https://estudios.apprecio.com/hubfs/logos/Apprecio-logo-rojo.png" class="logo" />
   <h1>Pedido Gift Cards</h1>
-
   <form method="POST" enctype="multipart/form-data"
         action="https://n8n.openip.cl/webhook/pedidosgc">
-
     <input type="hidden" name="idPanel" id="idPanelHidden">
     <input type="hidden" name="nombreSucursal" id="nombreSucursalHidden">
-
     <label>Tipo de solicitud</label>
     <div id="bloqueModificar" class="hidden">
       <div class="inline-row">
@@ -287,7 +262,6 @@ button {
         </div>
       </div>
     </div>
-
     <div class="top-options">
       <div class="option-group">
         <label>Envío</label>
@@ -307,10 +281,8 @@ button {
         <input type="hidden" name="modoPedido" id="modoPedidoHidden" value="nuevo">
       </div>
     </div>
-
     <label>Correo Ejecutivo Apprecio</label>
     <input type="email" name="correoEjecutivoApprecio" id="correoEjecutivo" required />
-
     <label>País</label>
     <select id="pais" name="pais" required>
       <option value="">Selecciona</option>
@@ -320,23 +292,18 @@ button {
       <option>Peru</option>
       <option>Mexico</option>
     </select>
-
     <label>Panel Empresa</label>
     <select id="panelEmpresa" name="panel" required>
       <option value="">Selecciona empresa</option>
     </select>
-
     <label>Razón Social</label>
     <input name="razon" id="razonSocial" readonly required />
-
     <label>ID Tributario</label>
     <input name="idTributario" id="rutEmpresa" readonly required />
-
     <label>Sucursal</label>
     <select name="sucursal" id="sucursalSelect" required>
       <option value="">Selecciona sucursal</option>
     </select>
-
     <label>Tipo de Pago</label>
     <select name="tipoPago" required>
       <option value="">Selecciona</option>
@@ -344,54 +311,41 @@ button {
       <option>Contado (TF)</option>
       <option>Reversa</option>
     </select>
-
     <label>OC</label>
     <input name="oc" required />
-
     <label>Requiere HES</label>
     <select name="HES" required>
       <option value="No" selected>No</option>
       <option value="Si">Si</option>
     </select>
-
     <label>Tipo de Gift Card</label>
     <select name="tipoGiftCard" required>
       <option value="">Selecciona</option>
       <option value="PDF">Gift card PDF</option>
       <option value="Delivery">Gift card Delivery</option>
     </select>
-
     <label>Gift Card física</label>
     <select name="giftCardFisica" required>
       <option value="No" selected>No</option>
       <option value="Si">Si</option>
     </select>
-
     <label>Descuento (%)</label>
     <input name="descuento" />
-
     <label>Comentarios</label>
     <textarea name="comentarios"></textarea>
-
     <hr class="hr">
-
     <label>Carga masiva (Excel / CSV)</label>
     <input type="file" id="bulkUpload" accept=".xlsx,.csv" />
-
     <div id="giftCardFields"></div>
-
     <button type="button" class="add-button" onclick="addGiftCardGroup()">
       ➕ Agregar Gift Card manual
     </button>
-
     <label>Adjuntar archivos</label>
     <input type="file" name="adjunto[]" multiple required />
-
     <button type="submit">Enviar pedido</button>
   </form>
 </div>
 </div>
-
 <!-- ============================================================
      SCRIPTS
 ============================================================ -->
@@ -400,10 +354,8 @@ button {
    CONFIGURACIÓN — ⚠️ EDITA ESTOS VALORES
 ============================================================ */
 const GOOGLE_CLIENT_ID = "790006243316-j8mt9cnbdoqtqenq4m908ls5kaj5murj.apps.googleusercontent.com";
-
 // Dominios permitidos (en minúsculas)
 const DOMINIOS_PERMITIDOS = ["apprecio.com", "dcanje.com"];
-
 /* ============================================================
    GOOGLE AUTH
 ============================================================ */
@@ -418,7 +370,6 @@ function iniciarLoginGoogle() {
   });
   client.requestAccessToken();
 }
-
 async function obtenerPerfilUsuario(accessToken) {
   const res = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
     headers: { Authorization: `Bearer ${accessToken}` }
@@ -426,49 +377,39 @@ async function obtenerPerfilUsuario(accessToken) {
   const perfil = await res.json();
   validarYMostrarApp(perfil);
 }
-
 function validarYMostrarApp(perfil) {
   const email = (perfil.email || "").toLowerCase();
   const dominio = email.split("@")[1] || "";
-
   if (!DOMINIOS_PERMITIDOS.includes(dominio)) {
     document.getElementById("domainError").style.display = "block";
     return;
   }
-
   // Guardar sesión en sessionStorage
   sessionStorage.setItem("gcUser", JSON.stringify({
     name: perfil.name,
     email: perfil.email,
     picture: perfil.picture
   }));
-
   mostrarApp(perfil);
 }
-
 function mostrarApp(perfil) {
   // Ocultar login
   document.getElementById("loginScreen").style.display = "none";
-
   // Mostrar barra de sesión
   const bar = document.getElementById("sessionBar");
   bar.style.display = "flex";
   document.getElementById("userAvatar").src = perfil.picture || "";
   document.getElementById("userName").textContent = perfil.name || "";
   document.getElementById("userEmail").textContent = perfil.email || "";
-
   // Mostrar formulario
   document.getElementById("appScreen").style.display = "block";
-
   // 🔥 Pre-rellenar correo ejecutivo automáticamente
   document.getElementById("correoEjecutivo").value = perfil.email || "";
 }
-
 function cerrarSesion() {
   sessionStorage.removeItem("gcUser");
   location.reload();
 }
-
 // Al cargar: revisar si ya hay sesión activa
 window.addEventListener("load", () => {
   const saved = sessionStorage.getItem("gcUser");
@@ -476,17 +417,14 @@ window.addEventListener("load", () => {
     mostrarApp(JSON.parse(saved));
   }
 });
-
 /* ============================================================
    TU CÓDIGO ORIGINAL (sin cambios)
 ============================================================ */
 const API_URL_STOCK   = "https://n8n.openip.cl/webhook/gc-stock";
 const API_URL_PEDIDOS = "https://n8n.openip.cl/webhook/gc-pedidos";
 const API_URL_EMPRESAS = "https://n8n.openip.cl/webhook/empresas";
-
 let empresasCache = [];
 let panelTomSelect = null;
-
 function normKey(k) { return String(k || "").trim().toLowerCase(); }
 function getAny(row, keys) {
   const map = {};
@@ -497,7 +435,6 @@ function getAny(row, keys) {
   }
   return undefined;
 }
-
 function limpiarFormularioCompleto() {
   document.querySelectorAll("input").forEach(input => {
     if (input.type !== "button" && input.type !== "submit" &&
@@ -513,7 +450,6 @@ function limpiarFormularioCompleto() {
   document.getElementById("sucursalSelect").innerHTML = '<option value="">Selecciona sucursal</option>';
   empresasCache = [];
 }
-
 function habilitarFormulario(estadoEditable) {
   document.querySelectorAll("input, select, textarea").forEach(el => {
     if (el.type === "hidden" || el.name === "modoPedido" || el.name === "tipoEnvio") return;
@@ -528,7 +464,6 @@ function habilitarFormulario(estadoEditable) {
     }
   });
 }
-
 function activarToggle(groupId, hiddenInputId, callback = null) {
   const group = document.getElementById(groupId);
   const hiddenInput = document.getElementById(hiddenInputId);
@@ -541,7 +476,6 @@ function activarToggle(groupId, hiddenInputId, callback = null) {
     });
   });
 }
-
 activarToggle("envioToggle", "tipoEnvio");
 activarToggle("modoPedidoToggle", "modoPedidoHidden", (valor) => {
   const bloque = document.getElementById("bloqueModificar");
@@ -564,7 +498,6 @@ activarToggle("modoPedidoToggle", "modoPedidoHidden", (valor) => {
     addBtn.style.display = "block";
   }
 });
-
 function activarBusquedaPanel() {
   if (panelTomSelect) panelTomSelect.destroy();
   panelTomSelect = new TomSelect("#panelEmpresa", {
@@ -574,7 +507,6 @@ function activarBusquedaPanel() {
     allowEmptyOption: true
   });
 }
-
 async function cargarEmpresasPorPais(pais, empresaSeleccionada = null, sucursalSeleccionada = null) {
   if (!pais) return;
   const res = await fetch(`${API_URL_EMPRESAS}?pais=${encodeURIComponent(pais)}`);
@@ -608,11 +540,9 @@ async function cargarEmpresasPorPais(pais, empresaSeleccionada = null, sucursalS
     }
   }
 }
-
 document.getElementById("pais").addEventListener("change", function () {
   cargarEmpresasPorPais(this.value);
 });
-
 document.getElementById("panelEmpresa").addEventListener("change", function () {
   const empresa = empresasCache.find(e => e.nombreEmpresa === this.value);
   if (!empresa) return;
@@ -634,14 +564,12 @@ document.getElementById("panelEmpresa").addEventListener("change", function () {
     sucursalSelect.appendChild(opt);
   });
 });
-
 document.getElementById("sucursalSelect").addEventListener("change", function () {
   const selectedOption = this.options[this.selectedIndex];
   if (!selectedOption) return;
   const nombreSucursal = this.value === "0" ? "Administrador" : (selectedOption.dataset.nombre || "");
   document.getElementById("nombreSucursalHidden").value = nombreSucursal;
 });
-
 async function buscarPedido() {
   const idPedido = document.getElementById("idPedido").value;
   if (!idPedido) { alert("Ingresa el ID Pedido"); return; }
@@ -681,7 +609,6 @@ async function buscarPedido() {
     alert("Pedido cargado. Revisa y ajusta antes de enviar.");
   }
 }
-
 async function addGiftCardGroup(prefill = {}) {
   const pais = document.getElementById("pais").value;
   if (!pais) { alert("Selecciona el país primero"); return; }
@@ -697,6 +624,7 @@ async function addGiftCardGroup(prefill = {}) {
     <select class="fuente-select" name="fuente[]" required>
       <option>Catálogo</option>
       <option>Proveedor</option>
+      <option>GC Propia</option>
     </select>
     <label>Monto Gift Card</label>
     <div class="monto-container"></div>
@@ -709,7 +637,6 @@ async function addGiftCardGroup(prefill = {}) {
   `;
   document.getElementById("giftCardFields").appendChild(wrapper);
   wrapper.querySelector(".delete-btn").addEventListener("click", () => wrapper.remove());
-
   const gift = wrapper.querySelector(".giftcard-select");
   const montoContainer = wrapper.querySelector(".monto-container");
   const stock = wrapper.querySelector(".stock-input");
@@ -717,16 +644,13 @@ async function addGiftCardGroup(prefill = {}) {
   const cantidad = wrapper.querySelector(".cantidad-input");
   const warning = wrapper.querySelector(".warning");
   const idInternoInput = wrapper.querySelector(".id-interno-input");
-
   if (idInternoInput) idInternoInput.value = prefill.idInterno ? String(prefill.idInterno) : "";
-
   const modo = document.getElementById("modoPedidoHidden")?.value;
   const idPedidoActual = document.getElementById("idPedido")?.value;
   if (modo === "modificar" && idPedidoActual && !idInternoInput.value) {
     const existentes = Array.from(document.querySelectorAll('input[name="idInterno[]"]')).filter(i => i.value);
     idInternoInput.value = `${idPedidoActual}_${existentes.length + 1}`;
   }
-
   await cargarGiftCards(gift);
   if (prefill.giftCard) {
     const exists = Array.from(gift.options).some(o => o.value === prefill.giftCard || o.textContent === prefill.giftCard);
@@ -739,14 +663,16 @@ async function addGiftCardGroup(prefill = {}) {
   }
   if (prefill.fuente) fuente.value = prefill.fuente;
   if (prefill.cantidad) cantidad.value = Number(prefill.cantidad);
-
   gift.addEventListener("change", async e => {
     if (fuente.value === "Catálogo") await cargarMontos(montoContainer, stock, e.target.value);
   });
   fuente.addEventListener("change", async () => {
     stock.value = ""; stock.dataset.original = ""; warning.style.display = "none";
-    if (fuente.value === "Proveedor") {
-      montoContainer.innerHTML = `<input type="number" name="monto[]" placeholder="Ingresa monto libre" required />`;
+    if (fuente.value === "Proveedor" || fuente.value === "GC Propia") {
+      const placeholder = fuente.value === "GC Propia"
+        ? "Ingresa monto (GC Propia)"
+        : "Ingresa monto libre";
+      montoContainer.innerHTML = `<input type="number" name="monto[]" placeholder="${placeholder}" required />`;
       if (prefill.monto !== undefined && prefill.monto !== null && prefill.monto !== "") {
         montoContainer.querySelector("input").value = Number(prefill.monto);
       }
@@ -771,7 +697,6 @@ async function addGiftCardGroup(prefill = {}) {
   });
   fuente.dispatchEvent(new Event("change"));
 }
-
 async function cargarGiftCards(select) {
   const pais = document.getElementById("pais").value;
   const res = await fetch(`${API_URL_STOCK}?pais=${encodeURIComponent(pais)}`);
@@ -779,7 +704,6 @@ async function cargarGiftCards(select) {
   select.innerHTML = `<option value="">Selecciona</option>` +
     (data.giftCards || []).map(g => `<option value="${String(g)}">${String(g)}</option>`).join('');
 }
-
 async function cargarMontos(container, stock, giftCard) {
   container.innerHTML = `<select class="monto-select" name="monto[]" required></select>`;
   const select = container.querySelector("select");
@@ -812,7 +736,6 @@ async function cargarMontos(container, stock, giftCard) {
     stock.dataset.original = s;
   });
 }
-
 document.getElementById("bulkUpload").addEventListener("change", e => {
   const file = e.target.files[0];
   if (!file) return;
@@ -831,7 +754,6 @@ document.getElementById("bulkUpload").addEventListener("change", e => {
   };
   reader.readAsArrayBuffer(file);
 });
-
 document.getElementById("pais").addEventListener("change", () => {
   document.getElementById("giftCardFields").innerHTML = "";
 });
