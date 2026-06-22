@@ -5,7 +5,6 @@
 <title>Pedido Gift Cards</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -641,11 +640,10 @@ input.input-error {
         <span id="bulkText">Seleccionar archivo .xlsx o .csv</span>
         <input type="file" id="bulkUpload" accept=".xlsx,.csv" />
       </label>
-      <button type="button" class="btn-plantilla" id="btnPlantilla" onclick="descargarPlantilla()" disabled title="Selecciona un país primero para generar la plantilla">
+      <button type="button" class="btn-plantilla" id="btnPlantilla" onclick="descargarPlantilla()" title="Descargar plantilla con los nombres de columnas correctos">
         📥 Plantilla
       </button>
     </div>
-    <div class="plantilla-hint visible" id="plantillaHint">Selecciona un país para descargar la plantilla con los desplegables correspondientes.</div>
 
     <div id="giftCardFields"></div>
 
@@ -1399,130 +1397,20 @@ document.getElementById("bulkUpload").addEventListener("change", e => {
 document.getElementById("pais").addEventListener("change", () => {
   document.getElementById("giftCardFields").innerHTML = "";
   calcularTotal();
-  // Enable/disable plantilla button based on country
-  const pais = document.getElementById("pais").value;
-  const btn = document.getElementById("btnPlantilla");
-  const hint = document.getElementById("plantillaHint");
-  if (pais) {
-    btn.disabled = false;
-    hint.classList.remove("visible");
-  } else {
-    btn.disabled = true;
-    hint.classList.add("visible");
-  }
 });
 
 /* ============================================================
-   DESCARGAR PLANTILLA EXCEL (con dropdowns via JSZip)
+   DESCARGAR PLANTILLA EXCEL
 ============================================================ */
-async function descargarPlantilla() {
-  const pais = document.getElementById("pais").value;
-  if (!pais) {
-    await showAlert("Selecciona el país primero para generar la plantilla.", { icon: '🌎', title: 'País requerido' });
-    return;
-  }
-
-  const btn = document.getElementById("btnPlantilla");
-  btn.disabled = true;
-  btn.textContent = "⏳ Generando...";
-
-  try {
-    // 1. Fetch gift cards del país
-    const res = await fetch(`${API_URL_STOCK}?pais=${encodeURIComponent(pais)}`);
-    const data = await res.json();
-    const giftCards = (data.giftCards || []).map(String);
-    const gcCount = giftCards.length;
-
-    // 2. Construir workbook con SheetJS
-    const wb = XLSX.utils.book_new();
-
-    // Hoja "Listas" (oculta) — valores para validaciones
-    const fuenteValues = ['Catálogo', 'Proveedor', 'GC Propia'];
-    const maxRows = Math.max(gcCount, fuenteValues.length);
-    const listasData = [['Gift Cards', 'Fuente']];
-    for (let i = 0; i < maxRows; i++) {
-      listasData.push([giftCards[i] || '', fuenteValues[i] || '']);
-    }
-    const wsListas = XLSX.utils.aoa_to_sheet(listasData);
-    wsListas['!cols'] = [{ wch: 32 }, { wch: 15 }];
-    XLSX.utils.book_append_sheet(wb, wsListas, 'Listas'); // → sheet1.xml
-
-    // Hoja "Pedido" (principal)
-    const headers = ['Gift Card', 'Fuente', 'Monto', 'Cantidad', 'Comisión (%)', 'Descuento (%)'];
-    const ws = XLSX.utils.aoa_to_sheet([headers]);
-    ws['!cols'] = [{ wch: 32 }, { wch: 14 }, { wch: 14 }, { wch: 11 }, { wch: 14 }, { wch: 14 }];
-    XLSX.utils.book_append_sheet(wb, ws, 'Pedido'); // → sheet2.xml
-
-    // Ocultar Listas
-    wb.Workbook = { Sheets: [{ Hidden: 1 }, {}] };
-
-    // 3. Escribir a Uint8Array
-    const wbBytes = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-
-    // 4. Abrir con JSZip y encontrar la hoja "Pedido"
-    const zip = await JSZip.loadAsync(wbBytes);
-
-    let sheetPath = 'xl/worksheets/sheet2.xml'; // default
-    try {
-      const wbXml   = await zip.file('xl/workbook.xml').async('string');
-      const relsXml = await zip.file('xl/_rels/workbook.xml.rels').async('string');
-      const rIdMatch  = wbXml.match(/name="Pedido"[^>]*r:id="([^"]+)"/);
-      if (rIdMatch) {
-        const pathMatch = relsXml.match(new RegExp(`Id="${rIdMatch[1]}"[^>]*Target="([^"]+)"`));
-        if (pathMatch) sheetPath = 'xl/' + pathMatch[1];
-      }
-    } catch (_) { /* usa default */ }
-
-    // 5. Inyectar <dataValidations> en el XML del sheet "Pedido"
-    //    SheetJS free no escribe validaciones — las inyectamos directamente en el XML.
-    const dvXml =
-      `<dataValidations count="2">` +
-      `<dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" ` +
-        `errorTitle="Gift Card no válida" ` +
-        `error="Selecciona una gift card disponible para ${pais}" ` +
-        `sqref="A2:A500">` +
-        `<formula1>Listas!$A$2:$A$${gcCount + 1}</formula1>` +
-      `</dataValidation>` +
-      `<dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" ` +
-        `errorTitle="Fuente no válida" ` +
-        `error="Selecciona: Catálogo, Proveedor o GC Propia" ` +
-        `sqref="B2:B500">` +
-        `<formula1>"Cat&#225;logo,Proveedor,GC Propia"</formula1>` +
-      `</dataValidation>` +
-      `</dataValidations>`;
-
-    const sheetXml = await zip.file(sheetPath).async('string');
-    const lastClose = sheetXml.lastIndexOf('</worksheet>');
-    const modifiedXml = sheetXml.slice(0, lastClose) + dvXml + '</worksheet>';
-    zip.file(sheetPath, modifiedXml);
-
-    // 6. Generar archivo y descargar
-    const content = await zip.generateAsync({
-      type: 'arraybuffer',
-      compression: 'DEFLATE',
-      compressionOptions: { level: 6 }
-    });
-    const blob = new Blob([content], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Plantilla_GiftCards_${pais}.xlsx`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    showToast(`Plantilla descargada para ${pais} — ${gcCount} gift cards disponibles.`, "success");
-
-  } catch (err) {
-    console.error(err);
-    await showAlert("Error al generar la plantilla. Verifica la conexión.", { icon: '❌', title: 'Error' });
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "📥 Plantilla";
-  }
+function descargarPlantilla() {
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet([
+    ['Gift Card', 'Fuente', 'Monto', 'Cantidad', 'Comisión (%)', 'Descuento (%)']
+  ]);
+  ws['!cols'] = [{ wch: 32 }, { wch: 14 }, { wch: 14 }, { wch: 11 }, { wch: 14 }, { wch: 14 }];
+  XLSX.utils.book_append_sheet(wb, ws, 'Pedido');
+  XLSX.writeFile(wb, 'Plantilla_GiftCards.xlsx');
+  showToast('Plantilla descargada.', 'success');
 }
 
 /* ============================================================
