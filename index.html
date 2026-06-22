@@ -5,6 +5,7 @@
 <title>Pedido Gift Cards</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -1383,7 +1384,7 @@ document.getElementById("bulkUpload").addEventListener("change", e => {
           fuente: getAny(r, ["Fuente","fuente"]) || "Catálogo",
           monto: getAny(r, ["Monto","monto","monto gc"]),
           cantidad: getAny(r, ["Cantidad","cantidad"]) || 1,
-          comision: getAny(r, ["Comisión","Comision","comision","comisión"]) || "",
+          comision: getAny(r, ["Comisión (%)","Comisión","Comision (%)","Comision","comision","comisión"]) || "",
           descuento: getAny(r, ["Descuento","descuento","Descuento (%)","descuento (%)"]) || ""
         });
       }
@@ -1412,7 +1413,7 @@ document.getElementById("pais").addEventListener("change", () => {
 });
 
 /* ============================================================
-   DESCARGAR PLANTILLA EXCEL
+   DESCARGAR PLANTILLA EXCEL (con dropdowns via JSZip)
 ============================================================ */
 async function descargarPlantilla() {
   const pais = document.getElementById("pais").value;
@@ -1426,78 +1427,98 @@ async function descargarPlantilla() {
   btn.textContent = "⏳ Generando...";
 
   try {
-    // Fetch gift cards y montos para este país
+    // 1. Fetch gift cards del país
     const res = await fetch(`${API_URL_STOCK}?pais=${encodeURIComponent(pais)}`);
     const data = await res.json();
     const giftCards = (data.giftCards || []).map(String);
+    const gcCount = giftCards.length;
 
+    // 2. Construir workbook con SheetJS
     const wb = XLSX.utils.book_new();
 
-    // ---- Hoja "Listas" (oculta) para validaciones ----
+    // Hoja "Listas" (oculta) — valores para validaciones
     const fuenteValues = ['Catálogo', 'Proveedor', 'GC Propia'];
-    const maxRows = Math.max(giftCards.length, fuenteValues.length);
+    const maxRows = Math.max(gcCount, fuenteValues.length);
     const listasData = [['Gift Cards', 'Fuente']];
     for (let i = 0; i < maxRows; i++) {
       listasData.push([giftCards[i] || '', fuenteValues[i] || '']);
     }
     const wsListas = XLSX.utils.aoa_to_sheet(listasData);
     wsListas['!cols'] = [{ wch: 32 }, { wch: 15 }];
-    XLSX.utils.book_append_sheet(wb, wsListas, 'Listas');
+    XLSX.utils.book_append_sheet(wb, wsListas, 'Listas'); // → sheet1.xml
 
-    // ---- Hoja "Pedido" (principal) ----
+    // Hoja "Pedido" (principal)
     const headers = ['Gift Card', 'Fuente', 'Monto', 'Cantidad', 'Comisión (%)', 'Descuento (%)'];
-    const exampleRow = [
-      giftCards[0] || 'Selecciona gift card',
-      'Catálogo',
-      '',
-      '1',
-      '',
-      ''
-    ];
-    const ws = XLSX.utils.aoa_to_sheet([headers, exampleRow]);
+    const ws = XLSX.utils.aoa_to_sheet([headers]);
+    ws['!cols'] = [{ wch: 32 }, { wch: 14 }, { wch: 14 }, { wch: 11 }, { wch: 14 }, { wch: 14 }];
+    XLSX.utils.book_append_sheet(wb, ws, 'Pedido'); // → sheet2.xml
 
-    ws['!cols'] = [
-      { wch: 32 }, // Gift Card
-      { wch: 14 }, // Fuente
-      { wch: 14 }, // Monto
-      { wch: 11 }, // Cantidad
-      { wch: 14 }, // Comisión (%)
-      { wch: 14 }, // Descuento (%)
-    ];
-
-    // Validaciones de datos (dropdowns)
-    const gcCount = giftCards.length;
-    ws['!dataValidations'] = [
-      {
-        sqref: 'A2:A500',
-        type: 'list',
-        formula1: `Listas!$A$2:$A$${gcCount + 1}`,
-        showDropDown: false,
-        error: 'Usa el desplegable para seleccionar una gift card disponible en ' + pais + '.',
-        errorTitle: 'Gift Card no válida',
-        showErrorMessage: true,
-      },
-      {
-        sqref: 'B2:B500',
-        type: 'list',
-        formula1: 'Listas!$B$2:$B$4',
-        showDropDown: false,
-        error: 'Selecciona: Catálogo, Proveedor o GC Propia.',
-        errorTitle: 'Fuente no válida',
-        showErrorMessage: true,
-      }
-    ];
-
-    XLSX.utils.book_append_sheet(wb, ws, 'Pedido');
-
-    // Ocultar hoja Listas
+    // Ocultar Listas
     wb.Workbook = { Sheets: [{ Hidden: 1 }, {}] };
 
-    XLSX.writeFile(wb, `Plantilla_GiftCards_${pais}.xlsx`);
-    showToast(`Plantilla descargada para ${pais} con ${gcCount} gift cards disponibles.`, "success");
+    // 3. Escribir a Uint8Array
+    const wbBytes = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+
+    // 4. Abrir con JSZip y encontrar la hoja "Pedido"
+    const zip = await JSZip.loadAsync(wbBytes);
+
+    let sheetPath = 'xl/worksheets/sheet2.xml'; // default
+    try {
+      const wbXml   = await zip.file('xl/workbook.xml').async('string');
+      const relsXml = await zip.file('xl/_rels/workbook.xml.rels').async('string');
+      const rIdMatch  = wbXml.match(/name="Pedido"[^>]*r:id="([^"]+)"/);
+      if (rIdMatch) {
+        const pathMatch = relsXml.match(new RegExp(`Id="${rIdMatch[1]}"[^>]*Target="([^"]+)"`));
+        if (pathMatch) sheetPath = 'xl/' + pathMatch[1];
+      }
+    } catch (_) { /* usa default */ }
+
+    // 5. Inyectar <dataValidations> en el XML del sheet "Pedido"
+    //    SheetJS free no escribe validaciones — las inyectamos directamente en el XML.
+    const dvXml =
+      `<dataValidations count="2">` +
+      `<dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" ` +
+        `errorTitle="Gift Card no válida" ` +
+        `error="Selecciona una gift card disponible para ${pais}" ` +
+        `sqref="A2:A500">` +
+        `<formula1>Listas!$A$2:$A$${gcCount + 1}</formula1>` +
+      `</dataValidation>` +
+      `<dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" ` +
+        `errorTitle="Fuente no válida" ` +
+        `error="Selecciona: Catálogo, Proveedor o GC Propia" ` +
+        `sqref="B2:B500">` +
+        `<formula1>"Cat&#225;logo,Proveedor,GC Propia"</formula1>` +
+      `</dataValidation>` +
+      `</dataValidations>`;
+
+    const sheetXml = await zip.file(sheetPath).async('string');
+    const lastClose = sheetXml.lastIndexOf('</worksheet>');
+    const modifiedXml = sheetXml.slice(0, lastClose) + dvXml + '</worksheet>';
+    zip.file(sheetPath, modifiedXml);
+
+    // 6. Generar archivo y descargar
+    const content = await zip.generateAsync({
+      type: 'arraybuffer',
+      compression: 'DEFLATE',
+      compressionOptions: { level: 6 }
+    });
+    const blob = new Blob([content], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Plantilla_GiftCards_${pais}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showToast(`Plantilla descargada para ${pais} — ${gcCount} gift cards disponibles.`, "success");
 
   } catch (err) {
-    await showAlert("Error al generar la plantilla. Verifica que hayas seleccionado un país y tengas conexión.", { icon: '❌', title: 'Error' });
+    console.error(err);
+    await showAlert("Error al generar la plantilla. Verifica la conexión.", { icon: '❌', title: 'Error' });
   } finally {
     btn.disabled = false;
     btn.textContent = "📥 Plantilla";
@@ -1534,4 +1555,3 @@ document.getElementById("mainForm").addEventListener("submit", async e => {
 </script>
 </body>
 </html>
-
