@@ -898,31 +898,40 @@ async function extraerMontoOC(file) {
       texto += content.items.map(i => i.str).join(' ') + '\n';
     }
 
-    const t = texto.toLowerCase();
-    // Patrón de monto: opcional símbolo moneda + número con separadores
-    const patMonto = /[\$s\/\.]*\s*([\d]{1,3}(?:[.,][\d]{3})*(?:[.,]\d{1,2})?|\d{4,})/g;
+    // 1. Eliminar RUTs chilenos (XX.XXX.XXX-D) para que no sean confundidos con montos
+    //    Patrón: dígitos con puntos, guión, dígito o K al final
+    const textoSinRut = texto.replace(/\d[\d.]*-[\dkK]\b/gi, '');
+
+    // 2. Buscar "TOTAL" (no SUBTOTAL — \bTOTAL\b no hace match dentro de SUBTOTAL)
+    //    seguido de símbolo de moneda opcional y número
+    const patTotal = /\bTOTAL\b[^$\d\n]*(?:\$|S\/\.?|CLP|PEN)?[ \t]*([\d.,]+)/gi;
+    const matchesTotal = [...textoSinRut.matchAll(patTotal)];
+    if (matchesTotal.length > 0) {
+      // El último TOTAL del documento es el gran total
+      const lastMatch = matchesTotal[matchesTotal.length - 1];
+      const num = parsearMontoTexto(lastMatch[1]);
+      if (num > 0) return num;
+    }
+
+    // 3. Buscar keywords explícitas como fallback
+    const t = textoSinRut.toLowerCase();
     const keywords = [
       'total a pagar', 'monto total', 'valor total', 'gran total',
-      'total neto', 'total bruto', 'total pedido', 'importe total', 'total'
+      'total neto', 'total bruto', 'total pedido', 'importe total'
     ];
-
-    // Busca montos cerca de keywords de total
+    const patMonto = /(?:\$|S\/\.?)?[ \t]*([\d]{1,3}(?:[.,][\d]{3})*(?:[.,]\d{1,2})?|\d{4,})/g;
     for (const kw of keywords) {
-      let idx = t.lastIndexOf(kw); // last = más probable que sea el gran total
+      const idx = t.lastIndexOf(kw);
       if (idx === -1) continue;
-      const ventana = t.slice(idx, idx + 120);
+      const ventana = textoSinRut.slice(idx, idx + 120);
       const matches = [...ventana.matchAll(patMonto)];
       for (const m of matches) {
         const num = parsearMontoTexto(m[1]);
-        if (num > 1000) return num;
+        if (num > 0) return num;
       }
     }
 
-    // Fallback: el número más grande del documento (> 10.000)
-    const todos = [...t.matchAll(patMonto)]
-      .map(m => parsearMontoTexto(m[1]))
-      .filter(n => n > 10000);
-    return todos.length ? Math.max(...todos) : null;
+    return null;
 
   } catch (e) {
     return null;
@@ -1563,98 +1572,17 @@ async function descargarPlantilla() {
   btn.textContent = "⏳ Generando...";
 
   try {
-    // 1. Fetch gift cards del país
-    const res = await fetch(`${API_URL_STOCK}?pais=${encodeURIComponent(pais)}`);
-    const data = await res.json();
-    const giftCards = (data.giftCards || []).map(String);
-    const gcCount = giftCards.length;
-
     const wb = XLSX.utils.book_new();
-
-    // Hoja oculta "Listas" con los valores válidos
-    const fuenteValues = ['Catálogo', 'Proveedor', 'GC Propia'];
-    const maxRows = Math.max(gcCount, fuenteValues.length);
-    const listasData = [['Gift Cards', 'Fuente']];
-    for (let i = 0; i < maxRows; i++) {
-      listasData.push([giftCards[i] || '', fuenteValues[i] || '']);
-    }
-    const wsListas = XLSX.utils.aoa_to_sheet(listasData);
-    wsListas['!cols'] = [{ wch: 32 }, { wch: 15 }];
-    XLSX.utils.book_append_sheet(wb, wsListas, 'Listas'); // → sheet1.xml
-
-    // Hoja principal "Pedido"
     const ws = XLSX.utils.aoa_to_sheet([
       ['Gift Card', 'Fuente', 'Monto', 'Cantidad', 'Comisión (%)', 'Descuento (%)']
     ]);
     ws['!cols'] = [{ wch: 32 }, { wch: 14 }, { wch: 14 }, { wch: 11 }, { wch: 14 }, { wch: 14 }];
-    XLSX.utils.book_append_sheet(wb, ws, 'Pedido'); // → sheet2.xml
-
-    // Ocultar Listas
-    wb.Workbook = { Sheets: [{ Hidden: 1 }, {}] };
-
-    // 2. Escribir a bytes
-    const wbBytes = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-
-    // 3. Abrir con JSZip
-    const zip = await JSZip.loadAsync(wbBytes);
-
-    // 4. Agregar named range en workbook.xml (más compatible que referencia directa)
-    const wbXmlOrig = await zip.file('xl/workbook.xml').async('string');
-    const namedRange = `<definedName name="GCList">Listas!$A$2:$A$${gcCount + 1}</definedName>`;
-    const wbXmlNew = wbXmlOrig.includes('<definedNames>')
-      ? wbXmlOrig.replace('<definedNames>', `<definedNames>${namedRange}`)
-      : wbXmlOrig.replace('</workbook>', `<definedNames>${namedRange}</definedNames></workbook>`);
-    zip.file('xl/workbook.xml', wbXmlNew);
-
-    // 5. Encontrar hoja "Pedido" y hacer detección robusta del path
-    let sheetPath = 'xl/worksheets/sheet2.xml';
-    try {
-      const relsXml  = await zip.file('xl/_rels/workbook.xml.rels').async('string');
-      const rIdMatch = wbXmlOrig.match(/name="Pedido"[^>]*r:id="([^"]+)"/);
-      if (rIdMatch) {
-        const pathMatch = relsXml.match(new RegExp(`Id="${rIdMatch[1]}"[^>]*Target="([^"]+)"`));
-        if (pathMatch) sheetPath = 'xl/' + pathMatch[1];
-      }
-    } catch (_) {}
-
-    // 6. Inyectar <dataValidations> — XML mínimo, sin atributos que puedan fallar
-    const dvXml =
-      `<dataValidations count="2">` +
-      `<dataValidation type="list" sqref="A2:A500">` +
-      `<formula1>GCList</formula1>` +                                          // usa named range
-      `</dataValidation>` +
-      `<dataValidation type="list" sqref="B2:B500">` +
-      `<formula1>"Catálogo,Proveedor,GC Propia"</formula1>` +             // inline list
-      `</dataValidation>` +
-      `</dataValidations>`;
-
-    const sheetXml = await zip.file(sheetPath).async('string');
-    const lastClose = sheetXml.lastIndexOf('</worksheet>');
-    zip.file(sheetPath, sheetXml.slice(0, lastClose) + dvXml + '</worksheet>');
-
-    // 7. Generar y descargar
-    const content = await zip.generateAsync({ type: 'arraybuffer', compression: 'DEFLATE' });
-    const blob = new Blob([content], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = `Plantilla_GiftCards_${pais}.xlsx`;
-    document.body.appendChild(a); a.click();
-    document.body.removeChild(a); URL.revokeObjectURL(url);
-
-    showToast(`Plantilla descargada — ${gcCount} gift cards disponibles en ${pais}.`, 'success');
-
+    XLSX.utils.book_append_sheet(wb, ws, 'Pedido');
+    XLSX.writeFile(wb, `Plantilla_GiftCards_${pais}.xlsx`);
+    showToast('Plantilla descargada correctamente.', 'success');
   } catch (err) {
     console.error(err);
-    // Fallback: descarga simple sin dropdowns
-    const wb2 = XLSX.utils.book_new();
-    const ws2 = XLSX.utils.aoa_to_sheet([
-      ['Gift Card', 'Fuente', 'Monto', 'Cantidad', 'Comisión (%)', 'Descuento (%)']
-    ]);
-    XLSX.utils.book_append_sheet(wb2, ws2, 'Pedido');
-    XLSX.writeFile(wb2, `Plantilla_GiftCards_${pais}.xlsx`);
-    showToast('Plantilla descargada (sin desplegables).', 'warning');
+    showToast('Error al generar la plantilla.', 'error');
   } finally {
     btn.disabled = false;
     btn.textContent = "📥 Plantilla";
