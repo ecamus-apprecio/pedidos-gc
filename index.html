@@ -6,7 +6,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -441,20 +440,6 @@ button:active:not(:disabled) { transform: translateY(0); }
 .ts-dropdown .option.active { background: #fff0f2 !important; color: #fa345e !important; }
 .ts-dropdown .option:hover { background: #fff0f2 !important; color: #fa345e !important; }
 
-/* OC Validación */
-.oc-validacion {
-  margin-top: 10px; padding: 13px 16px;
-  border-radius: 9px; font-size: 13px; font-weight: 500;
-  display: none; gap: 10px; align-items: flex-start;
-  line-height: 1.5;
-}
-.oc-validacion.visible { display: flex; }
-.oc-validacion .oc-icon { font-size: 20px; flex-shrink: 0; }
-.oc-validacion.ok      { background: #f0fdf4; border: 1.5px solid #bbf7d0; color: #166534; }
-.oc-validacion.warn    { background: #fffbeb; border: 1.5px solid #fde68a; color: #92400e; }
-.oc-validacion.fail    { background: #fff5f6; border: 1.5px solid #fcc;    color: #c0392b; }
-.oc-validacion.loading { background: #f9fafb; border: 1.5px solid #e5e7eb; color: #555; }
-
 /* Input error state */
 input.input-error {
   border-color: #fa345e !important;
@@ -698,10 +683,6 @@ input.input-error {
       <input type="file" name="adjunto[]" id="adjuntoInput" multiple required />
     </label>
     <div class="file-name" id="adjuntoNames"></div>
-    <div class="oc-validacion" id="ocValidacion">
-      <span class="oc-icon" id="ocIcon"></span>
-      <span id="ocMsg"></span>
-    </div>
 
     <button type="submit" class="btn-submit">🚀 Enviar pedido</button>
   </form>
@@ -712,14 +693,6 @@ input.input-error {
      SCRIPTS
 ============================================================ -->
 <script>
-/* ============================================================
-   PDF.JS WORKER
-============================================================ */
-if (typeof pdfjsLib !== 'undefined') {
-  pdfjsLib.GlobalWorkerOptions.workerSrc =
-    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-}
-
 /* ============================================================
    MODAL & TOAST SYSTEM
 ============================================================ */
@@ -853,137 +826,11 @@ document.getElementById("bulkUpload").addEventListener("change", function() {
   document.getElementById("bulkText").textContent = this.files[0]?.name || "Seleccionar archivo .xlsx o .csv";
 });
 
-/* ============================================================
-   VALIDACIÓN OC (PDF de texto)
-============================================================ */
-function mostrarOcEstado(tipo, icono, mensaje) {
-  const div = document.getElementById("ocValidacion");
-  div.className = `oc-validacion visible ${tipo}`;
-  document.getElementById("ocIcon").textContent = icono;
-  document.getElementById("ocMsg").innerHTML = mensaje;
-}
-
-function parsearMontoTexto(str) {
-  // Elimina símbolos de moneda y espacios, luego quita separadores de miles
-  const clean = str.replace(/[^\d.,]/g, '');
-  if (!clean) return 0;
-  // Si hay múltiples puntos (1.234.567) → separador de miles es punto
-  const puntos = (clean.match(/\./g) || []).length;
-  const comas  = (clean.match(/,/g)  || []).length;
-  let normalizado = clean;
-  if (puntos > 1)       normalizado = clean.replace(/\./g, '');          // 1.234.567 → 1234567
-  else if (comas > 1)   normalizado = clean.replace(/,/g, '');           // 1,234,567 → 1234567
-  else if (puntos === 1 && comas === 0) {
-    const dec = clean.split('.')[1];
-    if (dec && dec.length === 3) normalizado = clean.replace('.', '');   // 1.234 → 1234
-  } else if (comas === 1 && puntos === 0) {
-    const dec = clean.split(',')[1];
-    if (dec && dec.length === 3) normalizado = clean.replace(',', '');   // 1,234 → 1234
-    else normalizado = clean.replace(',', '.');                          // 1234,56 → decimal
-  }
-  return parseFloat(normalizado) || 0;
-}
-
-async function extraerMontoOC(file) {
-  if (!file || file.type !== 'application/pdf') return null;
-  if (typeof pdfjsLib === 'undefined') return null;
-
-  try {
-    const buffer = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
-    let texto = '';
-    for (let p = 1; p <= pdf.numPages; p++) {
-      const page = await pdf.getPage(p);
-      const content = await page.getTextContent();
-      texto += content.items.map(i => i.str).join(' ') + '\n';
-    }
-
-    // 1. Eliminar RUTs chilenos (XX.XXX.XXX-D) para que no sean confundidos con montos
-    //    Patrón: dígitos con puntos, guión, dígito o K al final
-    const textoSinRut = texto.replace(/\d[\d.]*-[\dkK]\b/gi, '');
-
-    // 2. Buscar "TOTAL" (no SUBTOTAL — \bTOTAL\b no hace match dentro de SUBTOTAL)
-    //    seguido de símbolo de moneda opcional y número
-    const patTotal = /\bTOTAL\b[^$\d\n]*(?:\$|S\/\.?|CLP|PEN)?[ \t]*([\d.,]+)/gi;
-    const matchesTotal = [...textoSinRut.matchAll(patTotal)];
-    if (matchesTotal.length > 0) {
-      // El último TOTAL del documento es el gran total
-      const lastMatch = matchesTotal[matchesTotal.length - 1];
-      const num = parsearMontoTexto(lastMatch[1]);
-      if (num > 0) return num;
-    }
-
-    // 3. Buscar keywords explícitas como fallback
-    const t = textoSinRut.toLowerCase();
-    const keywords = [
-      'total a pagar', 'monto total', 'valor total', 'gran total',
-      'total neto', 'total bruto', 'total pedido', 'importe total'
-    ];
-    const patMonto = /(?:\$|S\/\.?)?[ \t]*([\d]{1,3}(?:[.,][\d]{3})*(?:[.,]\d{1,2})?|\d{4,})/g;
-    for (const kw of keywords) {
-      const idx = t.lastIndexOf(kw);
-      if (idx === -1) continue;
-      const ventana = textoSinRut.slice(idx, idx + 120);
-      const matches = [...ventana.matchAll(patMonto)];
-      for (const m of matches) {
-        const num = parsearMontoTexto(m[1]);
-        if (num > 0) return num;
-      }
-    }
-
-    return null;
-
-  } catch (e) {
-    return null;
-  }
-}
-
-async function validarContraOC(files) {
-  const pdfFiles = Array.from(files).filter(f => f.type === 'application/pdf');
-  if (pdfFiles.length === 0) {
-    document.getElementById("ocValidacion").classList.remove("visible");
-    return;
-  }
-
-  mostrarOcEstado('loading', '⏳', 'Leyendo OC...');
-
-  // Intenta con el primer PDF adjunto
-  const monto = await extraerMontoOC(pdfFiles[0]);
-
-  if (monto === null) {
-    mostrarOcEstado('warn', '⚠️',
-      'No se pudo extraer el monto de la OC (PDF escaneado o sin texto). Valida manualmente.');
-    return;
-  }
-
-  const montoFormato = formatMonto(monto);
-
-  if (totalNumerico === 0) {
-    mostrarOcEstado('loading', 'ℹ️',
-      `Monto encontrado en OC: <strong>${montoFormato}</strong>. Agrega las gift cards para comparar.`);
-    return;
-  }
-
-  const diff    = Math.abs(totalNumerico - monto);
-  const pctDiff = diff / monto;
-
-  if (pctDiff <= 0.01) {
-    mostrarOcEstado('ok', '✅',
-      `Monto OC coincide con el total del pedido: <strong>${montoFormato}</strong>`);
-  } else {
-    const totalFmt = formatMonto(totalNumerico);
-    mostrarOcEstado('fail', '❌',
-      `El monto de la OC (<strong>${montoFormato}</strong>) no coincide con el total del pedido (<strong>${totalFmt}</strong>). ` +
-      `Diferencia: <strong>${formatMonto(diff)}</strong>`);
-  }
-}
-
 document.getElementById("adjuntoInput").addEventListener("change", function() {
   const names = Array.from(this.files).map(f => f.name).join(', ');
   const el = document.getElementById("adjuntoNames");
   if (names) { el.textContent = `📄 ${names}`; el.style.display = "block"; }
   else { el.style.display = "none"; }
-  validarContraOC(this.files);
 });
 
 /* ============================================================
@@ -1048,7 +895,7 @@ function formatMonto(amount) {
 /* ============================================================
    TOTAL CALCULATOR
 ============================================================ */
-let totalNumerico = 0; // tracked globally for OC validation
+let totalNumerico = 0;
 
 function calcularTotal() {
   const grupos = document.querySelectorAll(".gift-card-group");
