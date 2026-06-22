@@ -331,14 +331,47 @@ button:active:not(:disabled) { transform: translateY(0); }
 }
 .comentario-warning.hidden { display: none !important; }
 
-.comision-info {
+.comision-info, .descuento-info {
   margin-top: 6px; padding: 9px 12px;
-  background: #f0fdf4; border: 1.5px solid #bbf7d0;
-  color: #166534; border-radius: 8px;
-  font-size: 12px; font-weight: 500;
+  border-radius: 8px; font-size: 12px; font-weight: 500;
   display: none; align-items: center; gap: 6px;
 }
-.comision-info.visible { display: flex; }
+.comision-info {
+  background: #f0fdf4; border: 1.5px solid #bbf7d0; color: #166534;
+}
+.descuento-info {
+  background: #eff6ff; border: 1.5px solid #bfdbfe; color: #1d4ed8;
+}
+.comision-info.visible, .descuento-info.visible { display: flex; }
+
+/* Etiqueta "opcional" */
+.campo-opcional {
+  font-size: 10px; font-weight: 500; color: #aaa;
+  background: #f3f4f6; border-radius: 4px;
+  padding: 1px 6px; margin-left: 6px; vertical-align: middle;
+}
+
+/* Fila bulk upload + botón plantilla */
+.bulk-row {
+  display: flex; gap: 10px; align-items: stretch;
+}
+.btn-plantilla {
+  background: #fff; border: 1.5px solid #fa345e;
+  color: #fa345e; padding: 10px 16px;
+  font-size: 13px; font-weight: 600; white-space: nowrap;
+  border-radius: 9px; flex-shrink: 0;
+  transition: background .15s, color .15s;
+}
+.btn-plantilla:hover { background: #fa345e; color: #fff; }
+.btn-plantilla:disabled {
+  border-color: #ddd; color: #bbb; cursor: not-allowed;
+  background: #fafafa;
+}
+.plantilla-hint {
+  font-size: 11px; color: #aaa; margin-top: 5px;
+  display: none;
+}
+.plantilla-hint.visible { display: block; }
 
 /* ============================================================
    TOTAL PEDIDO
@@ -593,9 +626,6 @@ input.input-error {
       <option value="Si">Sí</option>
     </select>
 
-    <label>Descuento (%)</label>
-    <input name="descuento" id="descuentoGlobal" placeholder="Ej: 10%" oninput="calcularTotal()" onblur="formatearPorcentaje(this)" />
-
     <label>Comentarios</label>
     <textarea name="comentarios" placeholder="Notas adicionales para este pedido..."></textarea>
 
@@ -604,11 +634,17 @@ input.input-error {
     <div class="section-title">🎁 Gift Cards</div>
 
     <label>Carga masiva (Excel / CSV)</label>
-    <label class="file-label" id="bulkLabel">
-      <span class="file-icon">📂</span>
-      <span id="bulkText">Seleccionar archivo .xlsx o .csv</span>
-      <input type="file" id="bulkUpload" accept=".xlsx,.csv" />
-    </label>
+    <div class="bulk-row">
+      <label class="file-label" id="bulkLabel" style="flex:1">
+        <span class="file-icon">📂</span>
+        <span id="bulkText">Seleccionar archivo .xlsx o .csv</span>
+        <input type="file" id="bulkUpload" accept=".xlsx,.csv" />
+      </label>
+      <button type="button" class="btn-plantilla" id="btnPlantilla" onclick="descargarPlantilla()" disabled title="Selecciona un país primero para generar la plantilla">
+        📥 Plantilla
+      </button>
+    </div>
+    <div class="plantilla-hint visible" id="plantillaHint">Selecciona un país para descargar la plantilla con los desplegables correspondientes.</div>
 
     <div id="giftCardFields"></div>
 
@@ -628,7 +664,7 @@ input.input-error {
         <span class="value" id="totalComisionDisplay">+ $0</span>
       </div>
       <div class="total-row descuento-row hidden" id="rowDescuento">
-        <span class="label">Descuento global</span>
+        <span class="label">Descuentos</span>
         <span class="value" id="totalDescuentoDisplay">− $0</span>
       </div>
       <div class="total-row total-final">
@@ -868,37 +904,51 @@ function calcularTotal() {
 
   let subtotal = 0;
   let totalComision = 0;
+  let totalDescuento = 0;
 
   grupos.forEach(grupo => {
-    const montoEl = grupo.querySelector('[name="monto[]"]');
+    const montoEl    = grupo.querySelector('[name="monto[]"]');
     const cantidadEl = grupo.querySelector('.cantidad-input');
     const comisionEl = grupo.querySelector('.comision-input');
+    const descuentoEl = grupo.querySelector('.descuento-input');
 
-    const monto = parseFloat(montoEl?.value || 0) || 0;
-    const cantidad = parseFloat(cantidadEl?.value || 0) || 0;
-    const comisionPct = parsePercent(comisionEl?.value);
+    const monto      = parseFloat(montoEl?.value || 0) || 0;
+    const cantidad   = parseFloat(cantidadEl?.value || 0) || 0;
+    const comisionPct  = parsePercent(comisionEl?.value);
+    const descuentoPct = parsePercent(descuentoEl?.value);
 
-    const sub = monto * cantidad;
-    const com = sub * (comisionPct / 100);
-    subtotal += sub;
-    totalComision += com;
+    const sub  = monto * cantidad;
+    const com  = sub * (comisionPct / 100);
+    const desc = sub * (descuentoPct / 100);
 
-    // Update per-group info badge
-    const infoEl = grupo.querySelector('.comision-info');
-    if (infoEl) {
+    subtotal       += sub;
+    totalComision  += com;
+    totalDescuento += desc;
+
+    // Per-group comision badge
+    const comInfoEl = grupo.querySelector('.comision-info');
+    if (comInfoEl) {
       if (comisionPct > 0 && sub > 0) {
-        infoEl.innerHTML = `ℹ️ Comisión: ${formatMonto(com)} (${comisionPct}% de ${formatMonto(sub)})`;
-        infoEl.classList.add('visible');
+        comInfoEl.innerHTML = `ℹ️ Comisión: ${formatMonto(com)} (${comisionPct}% de ${formatMonto(sub)})`;
+        comInfoEl.classList.add('visible');
       } else {
-        infoEl.classList.remove('visible');
+        comInfoEl.classList.remove('visible');
+      }
+    }
+
+    // Per-group descuento badge
+    const descInfoEl = grupo.querySelector('.descuento-info');
+    if (descInfoEl) {
+      if (descuentoPct > 0 && sub > 0) {
+        descInfoEl.innerHTML = `🏷️ Descuento: −${formatMonto(desc)} (${descuentoPct}% de ${formatMonto(sub)})`;
+        descInfoEl.classList.add('visible');
+      } else {
+        descInfoEl.classList.remove('visible');
       }
     }
   });
 
-  const descuentoPct = parsePercent(document.getElementById("descuentoGlobal")?.value);
-  const baseConComision = subtotal + totalComision;
-  const descuentoMonto = baseConComision * (descuentoPct / 100);
-  const totalFinal = baseConComision - descuentoMonto;
+  const totalFinal = subtotal + totalComision - totalDescuento;
 
   // Update DOM
   document.getElementById("totalSubtotal").textContent = formatMonto(subtotal);
@@ -912,8 +962,8 @@ function calcularTotal() {
   }
 
   const rowDescuento = document.getElementById("rowDescuento");
-  if (descuentoMonto > 0) {
-    document.getElementById("totalDescuentoDisplay").textContent = `− ${formatMonto(descuentoMonto)}`;
+  if (totalDescuento > 0) {
+    document.getElementById("totalDescuentoDisplay").textContent = `− ${formatMonto(totalDescuento)}`;
     rowDescuento.classList.remove("hidden");
   } else {
     rowDescuento.classList.add("hidden");
@@ -1106,7 +1156,6 @@ async function buscarPedido() {
     document.querySelector('[name="oc"]').value = head["OC"] || "";
     document.querySelector('[name="sucursal"]').value = head["Sucursal"] || "";
     document.querySelector('[name="tipoGiftCard"]').value = head["Tipo de Gift card"] || head["Tipo de Gift Card"] || "";
-    document.querySelector('[name="descuento"]').value = head["Descuento"] || "";
     document.querySelector('[name="comentarios"]').value = head["Comentarios"] || "";
     document.querySelector('[name="giftCardFisica"]').value = head["GC Fisica"] || "No";
     for (const r of rows) {
@@ -1116,7 +1165,8 @@ async function buscarPedido() {
         fuente: r["Fuente"] || "Catálogo",
         monto: r["Monto GC"] ?? "",
         cantidad: r["Cantidad GC"] ?? 1,
-        comision: r["Comisión"] || r["Comision"] || ""
+        comision: r["Comisión"] || r["Comision"] || "",
+        descuento: r["Descuento"] || r["Descuento GC"] || ""
       });
     }
     const modoActual = document.getElementById("modoPedidoHidden").value;
@@ -1172,9 +1222,12 @@ async function addGiftCardGroup(prefill = {}) {
     <input class="stock-input" readonly />
     <label>Cantidad</label>
     <input type="number" class="cantidad-input" name="cantidad[]" min="1" required placeholder="Ej: 10" />
-    <label>Comisión (%)</label>
+    <label>Comisión (%) <span class="campo-opcional">opcional</span></label>
     <input type="text" class="comision-input" name="comision[]" placeholder="Ej: 5%" oninput="calcularTotal()" onblur="formatearPorcentaje(this)" />
     <div class="comision-info"></div>
+    <label>Descuento (%) <span class="campo-opcional">opcional</span></label>
+    <input type="text" class="descuento-input" name="descuento[]" placeholder="Ej: 10%" oninput="calcularTotal()" onblur="formatearPorcentaje(this)" />
+    <div class="descuento-info"></div>
     <div class="warning hidden">⚠️ Esta solicitud dejará el stock en 30% o menos.</div>
     <div class="comentario-warning hidden"></div>
   `;
@@ -1194,9 +1247,11 @@ async function addGiftCardGroup(prefill = {}) {
   const warning = wrapper.querySelector(".warning");
   const idInternoInput = wrapper.querySelector(".id-interno-input");
   const comisionInput = wrapper.querySelector(".comision-input");
+  const descuentoInput = wrapper.querySelector(".descuento-input");
 
   if (idInternoInput) idInternoInput.value = prefill.idInterno ? String(prefill.idInterno) : "";
   if (prefill.comision) comisionInput.value = String(prefill.comision);
+  if (prefill.descuento) descuentoInput.value = String(prefill.descuento);
 
   const modo = document.getElementById("modoPedidoHidden")?.value;
   const idPedidoActual = document.getElementById("idPedido")?.value;
@@ -1328,7 +1383,8 @@ document.getElementById("bulkUpload").addEventListener("change", e => {
           fuente: getAny(r, ["Fuente","fuente"]) || "Catálogo",
           monto: getAny(r, ["Monto","monto","monto gc"]),
           cantidad: getAny(r, ["Cantidad","cantidad"]) || 1,
-          comision: getAny(r, ["Comisión","Comision","comision","comisión"]) || ""
+          comision: getAny(r, ["Comisión","Comision","comision","comisión"]) || "",
+          descuento: getAny(r, ["Descuento","descuento","Descuento (%)","descuento (%)"]) || ""
         });
       }
       showToast(`${rows.length} gift cards cargadas correctamente.`, "success");
@@ -1342,7 +1398,111 @@ document.getElementById("bulkUpload").addEventListener("change", e => {
 document.getElementById("pais").addEventListener("change", () => {
   document.getElementById("giftCardFields").innerHTML = "";
   calcularTotal();
+  // Enable/disable plantilla button based on country
+  const pais = document.getElementById("pais").value;
+  const btn = document.getElementById("btnPlantilla");
+  const hint = document.getElementById("plantillaHint");
+  if (pais) {
+    btn.disabled = false;
+    hint.classList.remove("visible");
+  } else {
+    btn.disabled = true;
+    hint.classList.add("visible");
+  }
 });
+
+/* ============================================================
+   DESCARGAR PLANTILLA EXCEL
+============================================================ */
+async function descargarPlantilla() {
+  const pais = document.getElementById("pais").value;
+  if (!pais) {
+    await showAlert("Selecciona el país primero para generar la plantilla.", { icon: '🌎', title: 'País requerido' });
+    return;
+  }
+
+  const btn = document.getElementById("btnPlantilla");
+  btn.disabled = true;
+  btn.textContent = "⏳ Generando...";
+
+  try {
+    // Fetch gift cards y montos para este país
+    const res = await fetch(`${API_URL_STOCK}?pais=${encodeURIComponent(pais)}`);
+    const data = await res.json();
+    const giftCards = (data.giftCards || []).map(String);
+
+    const wb = XLSX.utils.book_new();
+
+    // ---- Hoja "Listas" (oculta) para validaciones ----
+    const fuenteValues = ['Catálogo', 'Proveedor', 'GC Propia'];
+    const maxRows = Math.max(giftCards.length, fuenteValues.length);
+    const listasData = [['Gift Cards', 'Fuente']];
+    for (let i = 0; i < maxRows; i++) {
+      listasData.push([giftCards[i] || '', fuenteValues[i] || '']);
+    }
+    const wsListas = XLSX.utils.aoa_to_sheet(listasData);
+    wsListas['!cols'] = [{ wch: 32 }, { wch: 15 }];
+    XLSX.utils.book_append_sheet(wb, wsListas, 'Listas');
+
+    // ---- Hoja "Pedido" (principal) ----
+    const headers = ['Gift Card', 'Fuente', 'Monto', 'Cantidad', 'Comisión (%)', 'Descuento (%)'];
+    const exampleRow = [
+      giftCards[0] || 'Selecciona gift card',
+      'Catálogo',
+      '',
+      '1',
+      '',
+      ''
+    ];
+    const ws = XLSX.utils.aoa_to_sheet([headers, exampleRow]);
+
+    ws['!cols'] = [
+      { wch: 32 }, // Gift Card
+      { wch: 14 }, // Fuente
+      { wch: 14 }, // Monto
+      { wch: 11 }, // Cantidad
+      { wch: 14 }, // Comisión (%)
+      { wch: 14 }, // Descuento (%)
+    ];
+
+    // Validaciones de datos (dropdowns)
+    const gcCount = giftCards.length;
+    ws['!dataValidations'] = [
+      {
+        sqref: 'A2:A500',
+        type: 'list',
+        formula1: `Listas!$A$2:$A$${gcCount + 1}`,
+        showDropDown: false,
+        error: 'Usa el desplegable para seleccionar una gift card disponible en ' + pais + '.',
+        errorTitle: 'Gift Card no válida',
+        showErrorMessage: true,
+      },
+      {
+        sqref: 'B2:B500',
+        type: 'list',
+        formula1: 'Listas!$B$2:$B$4',
+        showDropDown: false,
+        error: 'Selecciona: Catálogo, Proveedor o GC Propia.',
+        errorTitle: 'Fuente no válida',
+        showErrorMessage: true,
+      }
+    ];
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Pedido');
+
+    // Ocultar hoja Listas
+    wb.Workbook = { Sheets: [{ Hidden: 1 }, {}] };
+
+    XLSX.writeFile(wb, `Plantilla_GiftCards_${pais}.xlsx`);
+    showToast(`Plantilla descargada para ${pais} con ${gcCount} gift cards disponibles.`, "success");
+
+  } catch (err) {
+    await showAlert("Error al generar la plantilla. Verifica que hayas seleccionado un país y tengas conexión.", { icon: '❌', title: 'Error' });
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "📥 Plantilla";
+  }
+}
 
 /* ============================================================
    FORM SUBMIT
@@ -1354,14 +1514,14 @@ document.getElementById("mainForm").addEventListener("submit", async e => {
     await showAlert("Agrega al menos una gift card antes de enviar.", { icon: '🎁', title: 'Sin gift cards' });
     return;
   }
-  // Validate commission format: must be X% format
+  // Validate % fields: must be X% format if filled
   let camposPctInvalidos = [];
   grupos.forEach((g, i) => {
-    const val = g.querySelector('.comision-input')?.value;
-    if (val && !val.trim().endsWith('%')) camposPctInvalidos.push(`Gift Card #${i+1} — Comisión`);
+    const com  = g.querySelector('.comision-input')?.value?.trim();
+    const desc = g.querySelector('.descuento-input')?.value?.trim();
+    if (com  && !com.endsWith('%'))  camposPctInvalidos.push(`Gift Card #${i+1} — Comisión`);
+    if (desc && !desc.endsWith('%')) camposPctInvalidos.push(`Gift Card #${i+1} — Descuento`);
   });
-  const descVal = document.getElementById("descuentoGlobal")?.value;
-  if (descVal && !descVal.trim().endsWith('%')) camposPctInvalidos.push("Descuento global");
   if (camposPctInvalidos.length > 0) {
     e.preventDefault();
     await showAlert(
@@ -1374,3 +1534,4 @@ document.getElementById("mainForm").addEventListener("submit", async e => {
 </script>
 </body>
 </html>
+
