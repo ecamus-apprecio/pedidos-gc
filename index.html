@@ -149,7 +149,7 @@ body {
    SESSION BAR
 ============================================================ */
 #sessionBar {
-  max-width: 680px; margin: 0 auto 14px;
+  max-width: 960px; margin: 0 auto 14px;
   padding: 10px 18px; background: #fff;
   border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.07);
   display: none; align-items: center; gap: 12px;
@@ -174,10 +174,27 @@ body {
 ============================================================ */
 #appScreen { display: none; }
 .container {
-  max-width: 680px; background: #fff;
+  max-width: 960px; background: #fff;
   margin: auto; padding: 44px 48px;
   border-radius: 20px;
   box-shadow: 0 8px 32px rgba(0,0,0,.09);
+}
+
+/* Two-column layout */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 40px;
+  align-items: start;
+}
+.form-col .section-title:first-child { margin-top: 0; }
+.form-col-divider {
+  border: none; border-top: 1.5px solid #f0f0f0;
+  margin: 32px 0 0;
+}
+@media (max-width: 700px) {
+  .form-grid { grid-template-columns: 1fr; gap: 0; }
+  .container { padding: 28px 20px; }
 }
 .logo { display: block; margin: 0 auto 22px; max-width: 180px; }
 h1 {
@@ -527,110 +544,118 @@ input.input-error {
     <input type="hidden" name="idPanel" id="idPanelHidden">
     <input type="hidden" name="nombreSucursal" id="nombreSucursalHidden">
 
-    <!-- TIPO PEDIDO -->
-    <div class="section-title">⚙️ Configuración del Pedido</div>
+    <!-- TWO-COLUMN GRID -->
+    <div class="form-grid">
 
-    <div id="bloqueModificar" class="hidden">
-      <div class="inline-row">
-        <div>
-          <label>ID Pedido</label>
-          <input id="idPedido" name="idPedido" placeholder="Ej: 123" />
+      <!-- LEFT: Configuración + Datos de la Empresa -->
+      <div class="form-col">
+        <div class="section-title">⚙️ Configuración del Pedido</div>
+
+        <div id="bloqueModificar" class="hidden">
+          <div class="inline-row">
+            <div>
+              <label>ID Pedido</label>
+              <input id="idPedido" name="idPedido" placeholder="Ej: 123" />
+            </div>
+            <div style="display:flex;align-items:flex-end">
+              <button type="button" class="small-btn" onclick="buscarPedido()">🔍 Buscar</button>
+            </div>
+          </div>
         </div>
-        <div style="display:flex;align-items:flex-end">
-          <button type="button" class="small-btn" onclick="buscarPedido()">🔍 Buscar</button>
+
+        <div class="top-options">
+          <div class="option-group">
+            <label>Envío</label>
+            <div class="toggle-group" id="envioToggle">
+              <button type="button" class="toggle-btn active" data-value="Operaciones">Operaciones</button>
+              <button type="button" class="toggle-btn" data-value="Facturacion">Facturación</button>
+            </div>
+            <input type="hidden" name="tipoEnvio" id="tipoEnvio" value="Operaciones">
+          </div>
+          <div class="option-group">
+            <label>Tipo de pedido</label>
+            <div class="toggle-group" id="modoPedidoToggle">
+              <button type="button" class="toggle-btn active" data-value="nuevo">Nuevo</button>
+              <button type="button" class="toggle-btn" data-value="modificar">Modificar</button>
+              <button type="button" class="toggle-btn" data-value="anular">Anular</button>
+            </div>
+            <input type="hidden" name="modoPedido" id="modoPedidoHidden" value="nuevo">
+          </div>
         </div>
+
+        <div class="section-title">🏢 Datos de la Empresa</div>
+
+        <label>Correo Ejecutivo Apprecio</label>
+        <input type="email" name="correoEjecutivoApprecio" id="correoEjecutivo" required />
+
+        <label>País</label>
+        <select id="pais" name="pais" required>
+          <option value="">Selecciona país</option>
+          <option>Chile</option>
+          <option>Colombia</option>
+          <option>Ecuador</option>
+          <option>Peru</option>
+          <option>Mexico</option>
+        </select>
+
+        <label>Panel Empresa</label>
+        <select id="panelEmpresa" name="panel" required>
+          <option value="">Escribe para buscar empresa...</option>
+        </select>
+
+        <label>Razón Social</label>
+        <input name="razon" id="razonSocial" readonly required />
+
+        <label>ID Tributario</label>
+        <input name="idTributario" id="rutEmpresa" readonly required />
+
+        <label>Sucursal</label>
+        <select name="sucursal" id="sucursalSelect" required>
+          <option value="">Selecciona sucursal</option>
+        </select>
       </div>
-    </div>
 
-    <div class="top-options">
-      <div class="option-group">
-        <label>Envío</label>
-        <div class="toggle-group" id="envioToggle">
-          <button type="button" class="toggle-btn active" data-value="Operaciones">Operaciones</button>
-          <button type="button" class="toggle-btn" data-value="Facturacion">Facturación</button>
-        </div>
-        <input type="hidden" name="tipoEnvio" id="tipoEnvio" value="Operaciones">
+      <!-- RIGHT: Condiciones Comerciales -->
+      <div class="form-col">
+        <div class="section-title">💳 Condiciones Comerciales</div>
+
+        <label>Tipo de Pago</label>
+        <select name="tipoPago" required>
+          <option value="">Selecciona tipo de pago</option>
+          <option>Crédito (LC)</option>
+          <option>Contado (TF)</option>
+          <option>Reversa</option>
+        </select>
+
+        <label>OC</label>
+        <input name="oc" required placeholder="Número de orden de compra" />
+
+        <label>Requiere HES</label>
+        <select name="HES" required>
+          <option value="No" selected>No</option>
+          <option value="Si">Sí</option>
+        </select>
+
+        <label>Tipo de Gift Card</label>
+        <select name="tipoGiftCard" required>
+          <option value="">Selecciona tipo</option>
+          <option value="PDF">Gift card PDF</option>
+          <option value="Delivery">Gift card Delivery</option>
+        </select>
+
+        <label>Gift Card física</label>
+        <select name="giftCardFisica" required>
+          <option value="No" selected>No</option>
+          <option value="Si">Sí</option>
+        </select>
+
+        <label>Comentarios</label>
+        <textarea name="comentarios" placeholder="Notas adicionales para este pedido..."></textarea>
       </div>
-      <div class="option-group">
-        <label>Tipo de pedido</label>
-        <div class="toggle-group" id="modoPedidoToggle">
-          <button type="button" class="toggle-btn active" data-value="nuevo">Nuevo</button>
-          <button type="button" class="toggle-btn" data-value="modificar">Modificar</button>
-          <button type="button" class="toggle-btn" data-value="anular">Anular</button>
-        </div>
-        <input type="hidden" name="modoPedido" id="modoPedidoHidden" value="nuevo">
-      </div>
-    </div>
 
-    <!-- DATOS EMPRESA -->
-    <div class="section-title">🏢 Datos de la Empresa</div>
+    </div><!-- /form-grid -->
 
-    <label>Correo Ejecutivo Apprecio</label>
-    <input type="email" name="correoEjecutivoApprecio" id="correoEjecutivo" required />
-
-    <label>País</label>
-    <select id="pais" name="pais" required>
-      <option value="">Selecciona país</option>
-      <option>Chile</option>
-      <option>Colombia</option>
-      <option>Ecuador</option>
-      <option>Peru</option>
-      <option>Mexico</option>
-    </select>
-
-    <label>Panel Empresa</label>
-    <select id="panelEmpresa" name="panel" required>
-      <option value="">Escribe para buscar empresa...</option>
-    </select>
-
-    <label>Razón Social</label>
-    <input name="razon" id="razonSocial" readonly required />
-
-    <label>ID Tributario</label>
-    <input name="idTributario" id="rutEmpresa" readonly required />
-
-    <label>Sucursal</label>
-    <select name="sucursal" id="sucursalSelect" required>
-      <option value="">Selecciona sucursal</option>
-    </select>
-
-    <!-- CONDICIONES -->
-    <div class="section-title">💳 Condiciones Comerciales</div>
-
-    <label>Tipo de Pago</label>
-    <select name="tipoPago" required>
-      <option value="">Selecciona tipo de pago</option>
-      <option>Crédito (LC)</option>
-      <option>Contado (TF)</option>
-      <option>Reversa</option>
-    </select>
-
-    <label>OC</label>
-    <input name="oc" required placeholder="Número de orden de compra" />
-
-    <label>Requiere HES</label>
-    <select name="HES" required>
-      <option value="No" selected>No</option>
-      <option value="Si">Sí</option>
-    </select>
-
-    <label>Tipo de Gift Card</label>
-    <select name="tipoGiftCard" required>
-      <option value="">Selecciona tipo</option>
-      <option value="PDF">Gift card PDF</option>
-      <option value="Delivery">Gift card Delivery</option>
-    </select>
-
-    <label>Gift Card física</label>
-    <select name="giftCardFisica" required>
-      <option value="No" selected>No</option>
-      <option value="Si">Sí</option>
-    </select>
-
-    <label>Comentarios</label>
-    <textarea name="comentarios" placeholder="Notas adicionales para este pedido..."></textarea>
-
-    <!-- GIFT CARDS -->
+    <!-- GIFT CARDS (full width) -->
     <hr class="hr">
     <div class="section-title">🎁 Gift Cards</div>
 
