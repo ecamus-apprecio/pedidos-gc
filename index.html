@@ -492,6 +492,34 @@ button:active:not(:disabled) { transform: translateY(0); }
 .ts-dropdown .option.active { background: #fff0f2 !important; color: #fa345e !important; }
 .ts-dropdown .option:hover { background: #fff0f2 !important; color: #fa345e !important; }
 
+/* Help link box */
+.help-link-box {
+  margin-top: 14px;
+  padding: 11px 14px;
+  background: #fff8f9;
+  border: 1.5px solid #fde8ec;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.help-link-box span {
+  font-size: 12px;
+  color: #888;
+  font-weight: 500;
+}
+.help-link-box a {
+  font-size: 12px;
+  font-weight: 700;
+  color: #fa345e;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity .15s;
+}
+.help-link-box a:hover { opacity: .75; text-decoration: underline; }
+
 /* Input error state */
 input.input-error {
   border-color: #fa345e !important;
@@ -653,6 +681,13 @@ input.input-error {
         <select name="sucursal" id="sucursalSelect" required>
           <option value="">Selecciona sucursal</option>
         </select>
+
+        <div class="help-link-box">
+          <span>¿No aparece la empresa o sucursal?</span>
+          <a href="https://n8n.openip.cl/form/nuevas" target="_blank" rel="noopener">
+            Agregar nueva empresa / sucursal →
+          </a>
+        </div>
       </div>
 
       <!-- DIVIDER -->
