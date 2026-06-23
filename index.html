@@ -180,20 +180,55 @@ body {
   box-shadow: 0 8px 32px rgba(0,0,0,.09);
 }
 
+/* Configuración section (full width, centered) */
+.config-section {
+  margin-bottom: 4px;
+}
+.config-section .section-title {
+  text-align: center; border-bottom: none;
+  margin-bottom: 20px;
+  position: relative;
+}
+.config-section .section-title::after {
+  content: ''; position: absolute;
+  bottom: -6px; left: 50%; transform: translateX(-50%);
+  width: 40px; height: 2px;
+  background: #fa345e; border-radius: 2px;
+}
+.config-section .top-options {
+  justify-content: center; flex-wrap: wrap;
+}
+.config-hr {
+  margin: 28px 0;
+  border: none;
+  border-top: 1.5px solid #f0f0f0;
+}
+
 /* Two-column layout */
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0 40px;
+  grid-template-columns: 1fr 1px 1fr;
+  gap: 0;
   align-items: start;
 }
-.form-col .section-title:first-child { margin-top: 0; }
-.form-col-divider {
-  border: none; border-top: 1.5px solid #f0f0f0;
-  margin: 32px 0 0;
+.form-col { padding: 0 36px; }
+.form-col:first-child { padding-left: 0; }
+.form-col:last-child  { padding-right: 0; }
+.col-divider {
+  align-self: stretch;
+  background: linear-gradient(to bottom,
+    transparent 0%,
+    #fde8ec 8%,
+    #fde8ec 92%,
+    transparent 100%);
+  width: 1px;
 }
+.form-col .section-title:first-child { margin-top: 0; }
+
 @media (max-width: 700px) {
-  .form-grid { grid-template-columns: 1fr; gap: 0; }
+  .form-grid { grid-template-columns: 1fr; }
+  .col-divider { display: none; }
+  .form-col { padding: 0; }
   .container { padding: 28px 20px; }
 }
 .logo { display: block; margin: 0 auto 22px; max-width: 180px; }
@@ -544,45 +579,50 @@ input.input-error {
     <input type="hidden" name="idPanel" id="idPanelHidden">
     <input type="hidden" name="nombreSucursal" id="nombreSucursalHidden">
 
-    <!-- TWO-COLUMN GRID -->
+    <!-- CONFIGURACIÓN (full width, centered) -->
+    <div class="config-section">
+      <div class="section-title">⚙️ Configuración del Pedido</div>
+
+      <div id="bloqueModificar" class="hidden">
+        <div class="inline-row" style="max-width:400px;margin:0 auto 12px;">
+          <div>
+            <label>ID Pedido</label>
+            <input id="idPedido" name="idPedido" placeholder="Ej: 123" />
+          </div>
+          <div style="display:flex;align-items:flex-end">
+            <button type="button" class="small-btn" onclick="buscarPedido()">🔍 Buscar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="top-options">
+        <div class="option-group">
+          <label>Envío</label>
+          <div class="toggle-group" id="envioToggle">
+            <button type="button" class="toggle-btn active" data-value="Operaciones">Operaciones</button>
+            <button type="button" class="toggle-btn" data-value="Facturacion">Facturación</button>
+          </div>
+          <input type="hidden" name="tipoEnvio" id="tipoEnvio" value="Operaciones">
+        </div>
+        <div class="option-group">
+          <label>Tipo de pedido</label>
+          <div class="toggle-group" id="modoPedidoToggle">
+            <button type="button" class="toggle-btn active" data-value="nuevo">Nuevo</button>
+            <button type="button" class="toggle-btn" data-value="modificar">Modificar</button>
+            <button type="button" class="toggle-btn" data-value="anular">Anular</button>
+          </div>
+          <input type="hidden" name="modoPedido" id="modoPedidoHidden" value="nuevo">
+        </div>
+      </div>
+    </div>
+
+    <hr class="config-hr">
+
+    <!-- TWO-COLUMN GRID: Datos empresa | Condiciones -->
     <div class="form-grid">
 
-      <!-- LEFT: Configuración + Datos de la Empresa -->
+      <!-- LEFT: Datos de la Empresa -->
       <div class="form-col">
-        <div class="section-title">⚙️ Configuración del Pedido</div>
-
-        <div id="bloqueModificar" class="hidden">
-          <div class="inline-row">
-            <div>
-              <label>ID Pedido</label>
-              <input id="idPedido" name="idPedido" placeholder="Ej: 123" />
-            </div>
-            <div style="display:flex;align-items:flex-end">
-              <button type="button" class="small-btn" onclick="buscarPedido()">🔍 Buscar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="top-options">
-          <div class="option-group">
-            <label>Envío</label>
-            <div class="toggle-group" id="envioToggle">
-              <button type="button" class="toggle-btn active" data-value="Operaciones">Operaciones</button>
-              <button type="button" class="toggle-btn" data-value="Facturacion">Facturación</button>
-            </div>
-            <input type="hidden" name="tipoEnvio" id="tipoEnvio" value="Operaciones">
-          </div>
-          <div class="option-group">
-            <label>Tipo de pedido</label>
-            <div class="toggle-group" id="modoPedidoToggle">
-              <button type="button" class="toggle-btn active" data-value="nuevo">Nuevo</button>
-              <button type="button" class="toggle-btn" data-value="modificar">Modificar</button>
-              <button type="button" class="toggle-btn" data-value="anular">Anular</button>
-            </div>
-            <input type="hidden" name="modoPedido" id="modoPedidoHidden" value="nuevo">
-          </div>
-        </div>
-
         <div class="section-title">🏢 Datos de la Empresa</div>
 
         <label>Correo Ejecutivo Apprecio</label>
@@ -614,6 +654,9 @@ input.input-error {
           <option value="">Selecciona sucursal</option>
         </select>
       </div>
+
+      <!-- DIVIDER -->
+      <div class="col-divider"></div>
 
       <!-- RIGHT: Condiciones Comerciales -->
       <div class="form-col">
