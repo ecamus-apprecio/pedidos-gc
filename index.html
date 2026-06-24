@@ -492,6 +492,51 @@ button:active:not(:disabled) { transform: translateY(0); }
 .ts-dropdown .option.active { background: #fff0f2 !important; color: #fa345e !important; }
 .ts-dropdown .option:hover { background: #fff0f2 !important; color: #fa345e !important; }
 
+/* ============================================================
+   TOOLTIPS
+============================================================ */
+.tip {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 15px; height: 15px; border-radius: 50%;
+  background: #fde8ec; color: #fa345e;
+  font-size: 10px; font-weight: 800; font-style: normal;
+  cursor: help; margin-left: 5px; vertical-align: middle;
+  position: relative; flex-shrink: 0; user-select: none;
+  line-height: 1;
+}
+.tip::before {
+  content: attr(data-tip);
+  position: absolute; bottom: calc(100% + 9px); left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: #1c1c2e; color: #fff;
+  padding: 9px 13px; border-radius: 9px;
+  font-size: 12px; font-weight: 400; font-style: normal;
+  width: 210px; white-space: normal; line-height: 1.5;
+  text-align: left; text-transform: none; letter-spacing: 0;
+  opacity: 0; pointer-events: none;
+  transition: opacity .15s, transform .15s;
+  z-index: 9999;
+  box-shadow: 0 6px 20px rgba(0,0,0,.18);
+}
+.tip::after {
+  content: '';
+  position: absolute; bottom: calc(100% + 3px); left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent; border-top-color: #1c1c2e;
+  opacity: 0; pointer-events: none;
+  transition: opacity .15s; z-index: 9999;
+}
+.tip:hover::before { opacity: 1; transform: translateX(-50%) translateY(0); }
+.tip:hover::after  { opacity: 1; }
+
+/* Flip to left when near right edge */
+.tip.tip-left::before {
+  left: auto; right: -4px;
+  transform: translateX(0) translateY(4px);
+}
+.tip.tip-left::after  { left: auto; right: 8px; transform: none; }
+.tip.tip-left:hover::before { transform: translateX(0) translateY(0); }
+
 /* Help link box */
 .help-link-box {
   margin-top: 14px;
@@ -625,7 +670,7 @@ input.input-error {
 
       <div class="top-options">
         <div class="option-group">
-          <label>Envío</label>
+          <label>Envío <i class="tip" data-tip="Operaciones: lo procesa el equipo de Operaciones de Apprecio. Facturación: lo gestiona directamente el equipo de Facturación.">?</i></label>
           <div class="toggle-group" id="envioToggle">
             <button type="button" class="toggle-btn active" data-value="Operaciones">Operaciones</button>
             <button type="button" class="toggle-btn" data-value="Facturacion">Facturación</button>
@@ -633,7 +678,7 @@ input.input-error {
           <input type="hidden" name="tipoEnvio" id="tipoEnvio" value="Operaciones">
         </div>
         <div class="option-group">
-          <label>Tipo de pedido</label>
+          <label>Tipo de pedido <i class="tip" data-tip="Nuevo: pedido nuevo. Modificar: cambia cantidad o datos de un pedido existente (requiere ID). Anular: cancela un pedido ya enviado.">?</i></label>
           <div class="toggle-group" id="modoPedidoToggle">
             <button type="button" class="toggle-btn active" data-value="nuevo">Nuevo</button>
             <button type="button" class="toggle-btn" data-value="modificar">Modificar</button>
@@ -666,7 +711,7 @@ input.input-error {
           <option>Mexico</option>
         </select>
 
-        <label>Panel Empresa</label>
+        <label>Panel Empresa <i class="tip" data-tip="Busca la empresa por nombre. Si no aparece en el listado, usa el enlace de abajo para registrarla y vuelve a cargar el formulario.">?</i></label>
         <select id="panelEmpresa" name="panel" required>
           <option value="">Escribe para buscar empresa...</option>
         </select>
@@ -697,7 +742,7 @@ input.input-error {
       <div class="form-col">
         <div class="section-title">💳 Condiciones Comerciales</div>
 
-        <label>Tipo de Pago</label>
+        <label>Tipo de Pago <i class="tip tip-left" data-tip="Crédito (LC): pago con línea de crédito. Contado (TF): pago por transferencia bancaria. Reversa: el cargo se hace directamente al cliente.">?</i></label>
         <select name="tipoPago" required>
           <option value="">Selecciona tipo de pago</option>
           <option>Crédito (LC)</option>
@@ -708,20 +753,20 @@ input.input-error {
         <label>OC</label>
         <input name="oc" required placeholder="Número de orden de compra" />
 
-        <label>Requiere HES</label>
+        <label>Requiere HES <i class="tip tip-left" data-tip="Hoja de Entrada de Servicios. Algunos clientes la requieren para aprobar el pago antes de emitir la factura. Consulta con el cliente si no estás seguro.">?</i></label>
         <select name="HES" required>
           <option value="No" selected>No</option>
           <option value="Si">Sí</option>
         </select>
 
-        <label>Tipo de Gift Card</label>
+        <label>Tipo de Gift Card <i class="tip tip-left" data-tip="PDF: la gift card se envía por correo electrónico al cliente. Delivery: se entrega en formato físico o por otro canal de distribución.">?</i></label>
         <select name="tipoGiftCard" required>
           <option value="">Selecciona tipo</option>
           <option value="PDF">Gift card PDF</option>
           <option value="Delivery">Gift card Delivery</option>
         </select>
 
-        <label>Gift Card física</label>
+        <label>Gift Card física <i class="tip tip-left" data-tip="Indica si el cliente requiere la gift card en formato tarjeta plástica física, además del PDF digital.">?</i></label>
         <select name="giftCardFisica" required>
           <option value="No" selected>No</option>
           <option value="Si">Sí</option>
@@ -1316,7 +1361,7 @@ async function addGiftCardGroup(prefill = {}) {
     <select class="giftcard-select" name="giftCard[]" required></select>
     <label>ID Interno</label>
     <input class="id-interno-input" name="idInterno[]" readonly />
-    <label>Fuente</label>
+    <label>Fuente <i class="tip" data-tip="Catálogo: disponible en el catálogo Apprecio. Proveedor: se solicita directamente al proveedor. GC Propia: gift card de la empresa cliente.">?</i></label>
     <select class="fuente-select" name="fuente[]" required>
       <option>Catálogo</option>
       <option>Proveedor</option>
@@ -1328,10 +1373,10 @@ async function addGiftCardGroup(prefill = {}) {
     <input class="stock-input" readonly />
     <label>Cantidad</label>
     <input type="number" class="cantidad-input" name="cantidad[]" min="1" required placeholder="Ej: 10" />
-    <label>Comisión (%) <span class="campo-opcional">opcional</span></label>
+    <label>Comisión (%) <span class="campo-opcional">opcional</span> <i class="tip" data-tip="Porcentaje de comisión sobre el subtotal de esta gift card. Se suma al total del pedido. Ej: 5% sobre $100.000 agrega $5.000.">?</i></label>
     <input type="text" class="comision-input" name="comision[]" placeholder="Ej: 5%" oninput="calcularTotal()" onblur="formatearPorcentaje(this)" />
     <div class="comision-info"></div>
-    <label>Descuento (%) <span class="campo-opcional">opcional</span></label>
+    <label>Descuento (%) <span class="campo-opcional">opcional</span> <i class="tip" data-tip="Porcentaje de descuento sobre el subtotal de esta gift card. Se resta del total del pedido. Ej: 10% sobre $100.000 descuenta $10.000.">?</i></label>
     <input type="text" class="descuento-input" name="descuento[]" placeholder="Ej: 10%" oninput="calcularTotal()" onblur="formatearPorcentaje(this)" />
     <div class="descuento-info"></div>
     <div class="warning hidden">⚠️ Esta solicitud dejará el stock en 30% o menos.</div>
