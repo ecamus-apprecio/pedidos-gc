@@ -670,7 +670,7 @@ input.input-error {
 
       <div class="top-options">
         <div class="option-group">
-          <label>Envío <i class="tip" data-tip="Operaciones: lo procesa el equipo de Operaciones de Apprecio. Facturación: lo gestiona directamente el equipo de Facturación.">?</i></label>
+          <label>Envío <i class="tip" data-tip="Operaciones: el pedido se envía primero a Operaciones para que gestionen la carga. Facturación: se envía primero a Facturación para los casos que requieren una prefactura o similar antes de cargar el pedido.">?</i></label>
           <div class="toggle-group" id="envioToggle">
             <button type="button" class="toggle-btn active" data-value="Operaciones">Operaciones</button>
             <button type="button" class="toggle-btn" data-value="Facturacion">Facturación</button>
@@ -759,14 +759,14 @@ input.input-error {
           <option value="Si">Sí</option>
         </select>
 
-        <label>Tipo de Gift Card <i class="tip tip-left" data-tip="PDF: la gift card se envía por correo electrónico al cliente. Delivery: se entrega en formato físico o por otro canal de distribución.">?</i></label>
+        <label>Tipo de Gift Card <i class="tip tip-left" data-tip="PDF: se genera un PDF con la gift card para el usuario. Delivery: la gift card llega directamente al correo del usuario final, sin pasar por un PDF.">?</i></label>
         <select name="tipoGiftCard" required>
           <option value="">Selecciona tipo</option>
           <option value="PDF">Gift card PDF</option>
           <option value="Delivery">Gift card Delivery</option>
         </select>
 
-        <label>Gift Card física <i class="tip tip-left" data-tip="Indica si el cliente requiere la gift card en formato tarjeta plástica física, además del PDF digital.">?</i></label>
+        <label>Gift Card física</label>
         <select name="giftCardFisica" required>
           <option value="No" selected>No</option>
           <option value="Si">Sí</option>
