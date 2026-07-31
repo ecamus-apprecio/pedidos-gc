@@ -944,6 +944,7 @@ let panelTomSelect = null;
 ============================================================ */
 let productoActual = "giftcard";
 let supercardEmpresasCache = []; // [{ razonSocial, rut, contactos: [{nombre, email}] }]
+let razonSocialTomSelect = null;
 /* ============================================================
    UTILS
 ============================================================ */
@@ -1155,6 +1156,8 @@ function aplicarModoProducto(valor) {
   emailClienteInput.value = "";
   document.getElementById("panelEmpresa").innerHTML = '<option value="">Escribe para buscar empresa...</option>';
   activarBusquedaPanel();
+  if (razonSocialTomSelect) { razonSocialTomSelect.destroy(); razonSocialTomSelect = null; }
+  document.getElementById("razonSocialSupercardSelect").innerHTML = '<option value="">Selecciona razón social</option>';
 
   if (esSupercard) {
     // País fijo Colombia, visible pero bloqueado
@@ -1189,6 +1192,15 @@ function aplicarModoProducto(valor) {
   document.getElementById("addGiftCardBtn").textContent = esSupercard ? "➕ Agregar Supercard manual" : "➕ Agregar Gift Card manual";
   document.getElementById("btnPlantilla").disabled = esSupercard ? true : !paisSelect.value;
 }
+function activarBusquedaRazonSocialSupercard() {
+  if (razonSocialTomSelect) razonSocialTomSelect.destroy();
+  razonSocialTomSelect = new TomSelect("#razonSocialSupercardSelect", {
+    create: false,
+    sortField: { field: "text", direction: "asc" },
+    placeholder: "Escribe para buscar razón social...",
+    allowEmptyOption: true
+  });
+}
 async function cargarEmpresasSupercard() {
   try {
     const res = await fetch(`${API_URL_EMPRESAS}?pais=Colombia&producto=supercard`);
@@ -1197,6 +1209,7 @@ async function cargarEmpresasSupercard() {
     const select = document.getElementById("razonSocialSupercardSelect");
     select.innerHTML = '<option value="">Selecciona razón social</option>' +
       supercardEmpresasCache.map(e => `<option value="${e.razonSocial}">${e.razonSocial}</option>`).join('');
+    activarBusquedaRazonSocialSupercard();
   } catch (err) {
     showToast("Error cargando razones sociales de Supercard.", "error");
   }
