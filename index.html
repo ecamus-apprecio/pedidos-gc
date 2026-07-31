@@ -21,7 +21,6 @@ body {
   padding: 40px 0 60px;
   color: #222;
 }
-
 /* ============================================================
    CUSTOM MODAL
 ============================================================ */
@@ -77,7 +76,6 @@ body {
 .modal-btn.primary { background: #fa345e; color: #fff; }
 .modal-btn.secondary { background: #f0f0f0; color: #444; }
 .modal-btn.danger { background: #dc3545; color: #fff; }
-
 /* Toast */
 .toast-container {
   position: fixed; bottom: 28px; right: 28px;
@@ -108,7 +106,6 @@ body {
   from { opacity: 1; transform: translateX(0); }
   to   { opacity: 0; transform: translateX(24px); height: 0; padding: 0; margin: 0; }
 }
-
 /* ============================================================
    LOGIN
 ============================================================ */
@@ -144,7 +141,6 @@ body {
   background: #fff0f2; border: 1px solid #fcc;
   border-radius: 10px; color: #c0392b; font-size: 13px;
 }
-
 /* ============================================================
    SESSION BAR
 ============================================================ */
@@ -168,7 +164,6 @@ body {
   transition: background .15s;
 }
 #logoutBtn:hover { background: #fff0f2; }
-
 /* ============================================================
    MAIN FORM
 ============================================================ */
@@ -179,7 +174,6 @@ body {
   border-radius: 20px;
   box-shadow: 0 8px 32px rgba(0,0,0,.09);
 }
-
 /* Configuración section (full width, centered) */
 .config-section {
   margin-bottom: 4px;
@@ -203,7 +197,6 @@ body {
   border: none;
   border-top: 1.5px solid #f0f0f0;
 }
-
 /* Two-column layout */
 .form-grid {
   display: grid;
@@ -224,7 +217,6 @@ body {
   width: 1px;
 }
 .form-col .section-title:first-child { margin-top: 0; }
-
 @media (max-width: 700px) {
   .form-grid { grid-template-columns: 1fr; }
   .col-divider { display: none; }
@@ -237,7 +229,6 @@ h1 {
   font-size: 26px; font-weight: 700;
   margin-bottom: 34px; letter-spacing: -0.3px;
 }
-
 /* Section divider */
 .section-title {
   font-size: 11px; font-weight: 700;
@@ -245,7 +236,6 @@ h1 {
   color: #fa345e; margin: 28px 0 14px;
   padding-bottom: 6px; border-bottom: 1.5px solid #fde8ec;
 }
-
 /* Labels & Inputs */
 label {
   display: block; margin: 14px 0 5px;
@@ -273,7 +263,6 @@ input[readonly] {
 }
 select { cursor: pointer; }
 textarea { resize: vertical; min-height: 80px; }
-
 /* Buttons */
 button {
   font-family: 'Montserrat', sans-serif;
@@ -283,7 +272,6 @@ button {
 }
 button:hover:not(:disabled) { opacity: .9; transform: translateY(-1px); }
 button:active:not(:disabled) { transform: translateY(0); }
-
 .btn-submit {
   background: linear-gradient(135deg, #fa345e 0%, #e0174b 100%);
   color: #fff; padding: 14px 28px;
@@ -303,7 +291,6 @@ button:active:not(:disabled) { transform: translateY(0); }
   padding: 10px 16px; font-size: 14px;
   margin-top: 0;
 }
-
 /* Toggle buttons */
 .toggle-group { display: flex; gap: 8px; }
 .toggle-btn {
@@ -317,18 +304,14 @@ button:active:not(:disabled) { transform: translateY(0); }
   border-color: #fa345e !important;
   box-shadow: 0 3px 10px rgba(250,52,94,.3);
 }
-
 /* Top options */
 .top-options { display: flex; gap: 20px; margin-bottom: 8px; }
 .option-group { flex: 1; }
-
 /* Inline row */
 .inline-row { display: flex; gap: 10px; align-items: flex-end; }
 .inline-row > div { flex: 1; }
-
 /* HR */
 .hr { margin: 28px 0; border: none; border-top: 1.5px solid #f0f0f0; }
-
 /* ============================================================
    GIFT CARD GROUP
 ============================================================ */
@@ -365,7 +348,6 @@ button:active:not(:disabled) { transform: translateY(0); }
 .delete-btn:hover {
   background: #dc3545; color: #fff;
 }
-
 /* Warnings & Info */
 .warning {
   margin-top: 8px; padding: 11px 14px;
@@ -383,7 +365,6 @@ button:active:not(:disabled) { transform: translateY(0); }
   display: flex; align-items: flex-start; gap: 8px;
 }
 .comentario-warning.hidden { display: none !important; }
-
 .comision-info, .descuento-info {
   margin-top: 6px; padding: 9px 12px;
   border-radius: 8px; font-size: 12px; font-weight: 500;
@@ -396,14 +377,12 @@ button:active:not(:disabled) { transform: translateY(0); }
   background: #eff6ff; border: 1.5px solid #bfdbfe; color: #1d4ed8;
 }
 .comision-info.visible, .descuento-info.visible { display: flex; }
-
 /* Etiqueta "opcional" */
 .campo-opcional {
   font-size: 10px; font-weight: 500; color: #aaa;
   background: #f3f4f6; border-radius: 4px;
   padding: 1px 6px; margin-left: 6px; vertical-align: middle;
 }
-
 /* Fila bulk upload + botón plantilla */
 .bulk-row {
   display: flex; gap: 10px; align-items: stretch;
@@ -425,7 +404,6 @@ button:active:not(:disabled) { transform: translateY(0); }
   display: none;
 }
 .plantilla-hint.visible { display: block; }
-
 /* ============================================================
    TOTAL PEDIDO
 ============================================================ */
@@ -456,7 +434,6 @@ button:active:not(:disabled) { transform: translateY(0); }
 .total-row.total-final .value { color: #fa345e; font-size: 18px; }
 .total-row.descuento-row .value { color: #16a34a; }
 .total-row.comision-row .value { color: #d97706; }
-
 /* ============================================================
    FILE INPUT CUSTOM
 ============================================================ */
@@ -471,7 +448,6 @@ button:active:not(:disabled) { transform: translateY(0); }
 .file-label input[type="file"] { display: none; }
 .file-label .file-icon { font-size: 20px; }
 .file-name { font-size: 12px; color: #fa345e; font-weight: 600; margin-top: 5px; display: none; }
-
 /* ============================================================
    TOM SELECT OVERRIDES
 ============================================================ */
@@ -491,7 +467,6 @@ button:active:not(:disabled) { transform: translateY(0); }
 .ts-dropdown { border-radius: 9px !important; border: 1.5px solid #fde8ec !important; box-shadow: 0 8px 24px rgba(0,0,0,.1) !important; }
 .ts-dropdown .option.active { background: #fff0f2 !important; color: #fa345e !important; }
 .ts-dropdown .option:hover { background: #fff0f2 !important; color: #fa345e !important; }
-
 /* ============================================================
    TOOLTIPS
 ============================================================ */
@@ -528,7 +503,6 @@ button:active:not(:disabled) { transform: translateY(0); }
 }
 .tip:hover::before { opacity: 1; transform: translateX(-50%) translateY(0); }
 .tip:hover::after  { opacity: 1; }
-
 /* Flip to left when near right edge */
 .tip.tip-left::before {
   left: auto; right: -4px;
@@ -536,7 +510,6 @@ button:active:not(:disabled) { transform: translateY(0); }
 }
 .tip.tip-left::after  { left: auto; right: 8px; transform: none; }
 .tip.tip-left:hover::before { transform: translateX(0) translateY(0); }
-
 /* Help link box */
 .help-link-box {
   margin-top: 14px;
@@ -564,17 +537,19 @@ button:active:not(:disabled) { transform: translateY(0); }
   transition: opacity .15s;
 }
 .help-link-box a:hover { opacity: .75; text-decoration: underline; }
-
 /* Input error state */
 input.input-error {
   border-color: #fa345e !important;
   box-shadow: 0 0 0 3px rgba(250,52,94,.15) !important;
   background: #fff5f6 !important;
 }
-
 /* Hidden utility */
 .hidden { display: none !important; }
-
+/* Campo bloqueado (visible pero no editable, ej. País/Sucursal en Supercard) */
+.campo-bloqueado {
+  background: #f5f5f5 !important; color: #888 !important;
+  pointer-events: none !important; cursor: not-allowed !important;
+}
 /* Responsive */
 @media (max-width: 600px) {
   .container { padding: 28px 20px; }
@@ -584,12 +559,10 @@ input.input-error {
 </style>
 </head>
 <body>
-
 <!-- ============================================================
      TOAST CONTAINER
 ============================================================ -->
 <div class="toast-container" id="toastContainer"></div>
-
 <!-- ============================================================
      MODAL
 ============================================================ -->
@@ -601,7 +574,6 @@ input.input-error {
     <div class="modal-actions" id="modalActions"></div>
   </div>
 </div>
-
 <!-- ============================================================
      LOGIN
 ============================================================ -->
@@ -624,7 +596,6 @@ input.input-error {
     <p class="login-footer">Sistema interno — uso exclusivo del equipo Apprecio</p>
   </div>
 </div>
-
 <!-- ============================================================
      SESSION BAR
 ============================================================ -->
@@ -637,7 +608,6 @@ input.input-error {
   </div>
   <button id="logoutBtn" onclick="cerrarSesion()">Cerrar sesión</button>
 </div>
-
 <!-- ============================================================
      FORMULARIO
 ============================================================ -->
@@ -645,17 +615,14 @@ input.input-error {
 <div class="container">
   <img src="https://estudios.apprecio.com/hubfs/logos/Apprecio-logo-rojo.png" class="logo" />
   <h1>Pedido Gift Cards</h1>
-
   <form method="POST" enctype="multipart/form-data"
         action="https://n8n.openip.cl/webhook/pedidosgc"
         id="mainForm">
     <input type="hidden" name="idPanel" id="idPanelHidden">
     <input type="hidden" name="nombreSucursal" id="nombreSucursalHidden">
-
     <!-- CONFIGURACIÓN (full width, centered) -->
     <div class="config-section">
       <div class="section-title">⚙️ Configuración del Pedido</div>
-
       <div id="bloqueModificar" class="hidden">
         <div class="inline-row" style="max-width:400px;margin:0 auto 12px;">
           <div>
@@ -667,7 +634,6 @@ input.input-error {
           </div>
         </div>
       </div>
-
       <div class="top-options">
         <div class="option-group">
           <label>Envío <i class="tip" data-tip="Operaciones: el pedido se envía primero a Operaciones para que gestionen la carga. Facturación: se envía primero a Facturación para los casos que requieren una prefactura o similar antes de cargar el pedido.">?</i></label>
@@ -687,20 +653,26 @@ input.input-error {
           <input type="hidden" name="modoPedido" id="modoPedidoHidden" value="nuevo">
         </div>
       </div>
+      <div class="top-options" style="margin-top:4px;">
+        <div class="option-group" style="max-width:340px;margin:0 auto;">
+          <label>Producto <i class="tip" data-tip="Gift Cards: catálogo tradicional de gift cards. Supercard: producto exclusivo Colombia con datos de contacto del cliente final.">?</i></label>
+          <div class="toggle-group" id="productoToggle">
+            <button type="button" class="toggle-btn active" data-value="giftcard">Gift Cards</button>
+            <button type="button" class="toggle-btn" data-value="supercard">Supercard</button>
+          </div>
+          <!-- Sin atributo name: esta selección no se incluye en el output del webhook pedidosgc -->
+          <input type="hidden" id="productoHidden" value="giftcard">
+        </div>
+      </div>
     </div>
-
     <hr class="config-hr">
-
     <!-- TWO-COLUMN GRID: Datos empresa | Condiciones -->
     <div class="form-grid">
-
       <!-- LEFT: Datos de la Empresa -->
       <div class="form-col">
         <div class="section-title">🏢 Datos de la Empresa</div>
-
         <label>Correo Ejecutivo Apprecio</label>
         <input type="email" name="correoEjecutivoApprecio" id="correoEjecutivo" required />
-
         <label>País</label>
         <select id="pais" name="pais" required>
           <option value="">Selecciona país</option>
@@ -710,23 +682,34 @@ input.input-error {
           <option>Peru</option>
           <option>Mexico</option>
         </select>
-
-        <label>Panel Empresa <i class="tip" data-tip="Busca la empresa por nombre. Si no aparece en el listado, usa el enlace de abajo para registrarla y vuelve a cargar el formulario.">?</i></label>
-        <select id="panelEmpresa" name="panel" required>
-          <option value="">Escribe para buscar empresa...</option>
-        </select>
-
+        <div id="panelEmpresaWrapper">
+          <label>Panel Empresa <i class="tip" data-tip="Busca la empresa por nombre. Si no aparece en el listado, usa el enlace de abajo para registrarla y vuelve a cargar el formulario.">?</i></label>
+          <select id="panelEmpresa" name="panel" required>
+            <option value="">Escribe para buscar empresa...</option>
+          </select>
+        </div>
+        <div id="razonSocialSupercardWrapper" class="hidden">
+          <label>Razón Social <i class="tip" data-tip="Selecciona la razón social del cliente Supercard. El ID Tributario se autocompleta.">?</i></label>
+          <select id="razonSocialSupercardSelect">
+            <option value="">Selecciona razón social</option>
+          </select>
+        </div>
         <label>Razón Social</label>
         <input name="razon" id="razonSocial" readonly required />
-
         <label>ID Tributario</label>
         <input name="idTributario" id="rutEmpresa" readonly required />
-
         <label>Sucursal</label>
         <select name="sucursal" id="sucursalSelect" required>
           <option value="">Selecciona sucursal</option>
         </select>
-
+        <div id="clienteSupercardWrapper" class="hidden">
+          <label>Nombre del Cliente</label>
+          <select id="nombreClienteSelect" name="nombreCliente">
+            <option value="">Selecciona contacto</option>
+          </select>
+          <label>Email del Cliente</label>
+          <input id="emailClienteInput" name="emailCliente" readonly />
+        </div>
         <div class="help-link-box">
           <span>¿No aparece la empresa o sucursal?</span>
           <a href="https://n8n.openip.cl/form/nuevas" target="_blank" rel="noopener">
@@ -734,14 +717,11 @@ input.input-error {
           </a>
         </div>
       </div>
-
       <!-- DIVIDER -->
       <div class="col-divider"></div>
-
       <!-- RIGHT: Condiciones Comerciales -->
       <div class="form-col">
         <div class="section-title">💳 Condiciones Comerciales</div>
-
         <label>Tipo de Pago <i class="tip tip-left" data-tip="Crédito (LC): pago con línea de crédito. Contado (TF): pago por transferencia bancaria. Reversa: el cargo se hace directamente al cliente.">?</i></label>
         <select name="tipoPago" required>
           <option value="">Selecciona tipo de pago</option>
@@ -749,39 +729,32 @@ input.input-error {
           <option>Contado (TF)</option>
           <option>Reversa</option>
         </select>
-
         <label>OC</label>
         <input name="oc" required placeholder="Número de orden de compra" />
-
         <label>Requiere HES <i class="tip tip-left" data-tip="Hoja de Entrada de Servicios. Algunos clientes la requieren para aprobar el pago antes de emitir la factura. Consulta con el cliente si no estás seguro.">?</i></label>
         <select name="HES" required>
           <option value="No" selected>No</option>
           <option value="Si">Sí</option>
         </select>
-
         <label>Tipo de Gift Card <i class="tip tip-left" data-tip="PDF: se genera un PDF con la gift card para el usuario. Delivery: la gift card llega directamente al correo del usuario final, sin pasar por un PDF.">?</i></label>
-        <select name="tipoGiftCard" required>
+        <select name="tipoGiftCard" id="tipoGiftCardSelect" required>
           <option value="">Selecciona tipo</option>
           <option value="PDF">Gift card PDF</option>
           <option value="Delivery">Gift card Delivery</option>
+          <option value="Supercard">Supercard</option>
         </select>
-
         <label>Gift Card física</label>
         <select name="giftCardFisica" required>
           <option value="No" selected>No</option>
           <option value="Si">Sí</option>
         </select>
-
         <label>Comentarios</label>
         <textarea name="comentarios" placeholder="Notas adicionales para este pedido..."></textarea>
       </div>
-
     </div><!-- /form-grid -->
-
     <!-- GIFT CARDS (full width) -->
     <hr class="hr">
-    <div class="section-title">🎁 Gift Cards</div>
-
+    <div class="section-title" id="giftCardsSectionTitle">🎁 Gift Cards</div>
     <label>Carga masiva (Excel / CSV)</label>
     <div class="bulk-row">
       <label class="file-label" id="bulkLabel" style="flex:1">
@@ -793,13 +766,10 @@ input.input-error {
         📥 Plantilla
       </button>
     </div>
-
     <div id="giftCardFields"></div>
-
-    <button type="button" class="add-button" onclick="addGiftCardGroup()">
+    <button type="button" class="add-button" id="addGiftCardBtn" onclick="addGiftCardGroup()">
       ➕ Agregar Gift Card manual
     </button>
-
     <!-- RESUMEN TOTAL -->
     <div class="resumen-card" id="resumenPedido">
       <h3>💰 Total del Pedido</h3>
@@ -820,23 +790,19 @@ input.input-error {
         <span class="value" id="totalFinal">$0</span>
       </div>
     </div>
-
     <!-- ADJUNTOS -->
     <hr class="hr">
     <div class="section-title">📎 Archivos Adjuntos</div>
-
     <label class="file-label" id="adjuntoLabel">
       <span class="file-icon">📎</span>
       <span id="adjuntoText">Seleccionar archivos adjuntos (OC, HES, etc.)</span>
       <input type="file" name="adjunto[]" id="adjuntoInput" multiple required />
     </label>
     <div class="file-name" id="adjuntoNames"></div>
-
     <button type="submit" class="btn-submit">🚀 Enviar pedido</button>
   </form>
 </div>
 </div>
-
 <!-- ============================================================
      SCRIPTS
 ============================================================ -->
@@ -845,7 +811,6 @@ input.input-error {
    MODAL & TOAST SYSTEM
 ============================================================ */
 let modalResolve = null;
-
 function showModal({ icon = 'ℹ️', title = '', message = '', buttons = [{ label: 'Aceptar', cls: 'primary', value: true }] }) {
   return new Promise(resolve => {
     modalResolve = resolve;
@@ -864,23 +829,19 @@ function showModal({ icon = 'ℹ️', title = '', message = '', buttons = [{ lab
     document.getElementById('modalOverlay').classList.add('visible');
   });
 }
-
 function closeModal() {
   document.getElementById('modalOverlay').classList.remove('visible');
 }
-
 document.getElementById('modalOverlay').addEventListener('click', e => {
   if (e.target === document.getElementById('modalOverlay')) {
     closeModal();
     if (modalResolve) modalResolve(false);
   }
 });
-
 // Replaces alert()
 function showAlert(message, { icon = '⚠️', title = 'Aviso' } = {}) {
   return showModal({ icon, title, message: String(message), buttons: [{ label: 'Entendido', cls: 'primary', value: true }] });
 }
-
 // Replaces confirm()
 function showConfirm(message, { icon = '❓', title = '¿Confirmar?' } = {}) {
   return showModal({
@@ -891,7 +852,6 @@ function showConfirm(message, { icon = '❓', title = '¿Confirmar?' } = {}) {
     ]
   });
 }
-
 function showToast(message, type = 'info') {
   const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
   const t = document.createElement('div');
@@ -903,13 +863,11 @@ function showToast(message, type = 'info') {
     setTimeout(() => t.remove(), 300);
   }, 3800);
 }
-
 /* ============================================================
    CONFIG
 ============================================================ */
 const GOOGLE_CLIENT_ID = "790006243316-j8mt9cnbdoqtqenq4m908ls5kaj5murj.apps.googleusercontent.com";
 const DOMINIOS_PERMITIDOS = ["apprecio.com", "dcanje.com"];
-
 /* ============================================================
    GOOGLE AUTH
 ============================================================ */
@@ -924,7 +882,6 @@ function iniciarLoginGoogle() {
   });
   client.requestAccessToken();
 }
-
 async function obtenerPerfilUsuario(accessToken) {
   const res = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
     headers: { Authorization: `Bearer ${accessToken}` }
@@ -932,7 +889,6 @@ async function obtenerPerfilUsuario(accessToken) {
   const perfil = await res.json();
   validarYMostrarApp(perfil);
 }
-
 function validarYMostrarApp(perfil) {
   const email = (perfil.email || "").toLowerCase();
   const dominio = email.split("@")[1] || "";
@@ -945,7 +901,6 @@ function validarYMostrarApp(perfil) {
   }));
   mostrarApp(perfil);
 }
-
 function mostrarApp(perfil) {
   document.getElementById("loginScreen").style.display = "none";
   const bar = document.getElementById("sessionBar");
@@ -956,31 +911,26 @@ function mostrarApp(perfil) {
   document.getElementById("appScreen").style.display = "block";
   document.getElementById("correoEjecutivo").value = perfil.email || "";
 }
-
 function cerrarSesion() {
   sessionStorage.removeItem("gcUser");
   location.reload();
 }
-
 window.addEventListener("load", () => {
   const saved = sessionStorage.getItem("gcUser");
   if (saved) mostrarApp(JSON.parse(saved));
 });
-
 /* ============================================================
    FILE INPUT LABELS
 ============================================================ */
 document.getElementById("bulkUpload").addEventListener("change", function() {
   document.getElementById("bulkText").textContent = this.files[0]?.name || "Seleccionar archivo .xlsx o .csv";
 });
-
 document.getElementById("adjuntoInput").addEventListener("change", function() {
   const names = Array.from(this.files).map(f => f.name).join(', ');
   const el = document.getElementById("adjuntoNames");
   if (names) { el.textContent = `📄 ${names}`; el.style.display = "block"; }
   else { el.style.display = "none"; }
 });
-
 /* ============================================================
    API URLs
 ============================================================ */
@@ -989,7 +939,11 @@ const API_URL_PEDIDOS  = "https://n8n.openip.cl/webhook/gc-pedidos";
 const API_URL_EMPRESAS = "https://n8n.openip.cl/webhook/empresas";
 let empresasCache = [];
 let panelTomSelect = null;
-
+/* ============================================================
+   PRODUCTO (Gift Cards / Supercard)
+============================================================ */
+let productoActual = "giftcard";
+let supercardEmpresasCache = []; // [{ razonSocial, rut, contactos: [{nombre, email}] }]
 /* ============================================================
    UTILS
 ============================================================ */
@@ -1006,7 +960,6 @@ function getAny(row, keys) {
 function parsePercent(val) {
   return parseFloat(String(val || "0").replace(/%/g, "").trim()) || 0;
 }
-
 // Auto-formats a % field: adds "%" suffix if missing, strips invalid chars
 function formatearPorcentaje(input) {
   const raw = input.value.trim();
@@ -1039,42 +992,34 @@ function formatMonto(amount) {
     return amount.toLocaleString();
   }
 }
-
 /* ============================================================
    TOTAL CALCULATOR
 ============================================================ */
 let totalNumerico = 0;
-
 function calcularTotal() {
   const grupos = document.querySelectorAll(".gift-card-group");
   if (grupos.length === 0) {
     document.getElementById("resumenPedido").style.display = "none";
     return;
   }
-
   let subtotal = 0;
   let totalComision = 0;
   let totalDescuento = 0;
-
   grupos.forEach(grupo => {
     const montoEl    = grupo.querySelector('[name="monto[]"]');
     const cantidadEl = grupo.querySelector('.cantidad-input');
     const comisionEl = grupo.querySelector('.comision-input');
     const descuentoEl = grupo.querySelector('.descuento-input');
-
     const monto      = parseFloat(montoEl?.value || 0) || 0;
     const cantidad   = parseFloat(cantidadEl?.value || 0) || 0;
     const comisionPct  = parsePercent(comisionEl?.value);
     const descuentoPct = parsePercent(descuentoEl?.value);
-
     const sub  = monto * cantidad;
     const com  = sub * (comisionPct / 100);
     const desc = sub * (descuentoPct / 100);
-
     subtotal       += sub;
     totalComision  += com;
     totalDescuento += desc;
-
     // Per-group comision badge
     const comInfoEl = grupo.querySelector('.comision-info');
     if (comInfoEl) {
@@ -1085,7 +1030,6 @@ function calcularTotal() {
         comInfoEl.classList.remove('visible');
       }
     }
-
     // Per-group descuento badge
     const descInfoEl = grupo.querySelector('.descuento-info');
     if (descInfoEl) {
@@ -1097,12 +1041,9 @@ function calcularTotal() {
       }
     }
   });
-
   const totalFinal = subtotal + totalComision - totalDescuento;
-
   // Update DOM
   document.getElementById("totalSubtotal").textContent = formatMonto(subtotal);
-
   const rowComision = document.getElementById("rowComision");
   if (totalComision > 0) {
     document.getElementById("totalComisionDisplay").textContent = `+ ${formatMonto(totalComision)}`;
@@ -1110,7 +1051,6 @@ function calcularTotal() {
   } else {
     rowComision.classList.add("hidden");
   }
-
   const rowDescuento = document.getElementById("rowDescuento");
   if (totalDescuento > 0) {
     document.getElementById("totalDescuentoDisplay").textContent = `− ${formatMonto(totalDescuento)}`;
@@ -1118,14 +1058,11 @@ function calcularTotal() {
   } else {
     rowDescuento.classList.add("hidden");
   }
-
   totalNumerico = totalFinal; // keep global in sync
   document.getElementById("totalFinal").textContent = formatMonto(totalFinal);
-
   const resumen = document.getElementById("resumenPedido");
   resumen.style.display = subtotal > 0 ? "block" : "none";
 }
-
 /* ============================================================
    FORM HELPERS
 ============================================================ */
@@ -1142,7 +1079,6 @@ function limpiarFormularioCompleto() {
   document.getElementById("resumenPedido").style.display = "none";
   empresasCache = [];
 }
-
 function habilitarFormulario(estadoEditable) {
   document.querySelectorAll("input, select, textarea").forEach(el => {
     if (el.type === "hidden" || el.name === "modoPedido" || el.name === "tipoEnvio") return;
@@ -1157,7 +1093,6 @@ function habilitarFormulario(estadoEditable) {
     }
   });
 }
-
 function activarToggle(groupId, hiddenInputId, callback = null) {
   const group = document.getElementById(groupId);
   const hiddenInput = document.getElementById(hiddenInputId);
@@ -1170,7 +1105,6 @@ function activarToggle(groupId, hiddenInputId, callback = null) {
     });
   });
 }
-
 activarToggle("envioToggle", "tipoEnvio");
 activarToggle("modoPedidoToggle", "modoPedidoHidden", (valor) => {
   const bloque = document.getElementById("bloqueModificar");
@@ -1193,7 +1127,101 @@ activarToggle("modoPedidoToggle", "modoPedidoHidden", (valor) => {
     addBtn.style.display = "block";
   }
 });
+activarToggle("productoToggle", "productoHidden", aplicarModoProducto);
+function aplicarModoProducto(valor) {
+  productoActual = valor;
+  const esSupercard = valor === "supercard";
+  const paisSelect = document.getElementById("pais");
+  const sucursalSelect = document.getElementById("sucursalSelect");
+  const panelEmpresaWrapper = document.getElementById("panelEmpresaWrapper");
+  const razonSocialSupercardWrapper = document.getElementById("razonSocialSupercardWrapper");
+  const clienteSupercardWrapper = document.getElementById("clienteSupercardWrapper");
+  const tipoGCSelect = document.getElementById("tipoGiftCardSelect");
+  const nombreClienteSelect = document.getElementById("nombreClienteSelect");
+  const emailClienteInput = document.getElementById("emailClienteInput");
 
+  // Toggle Panel Empresa <-> Razón Social (Supercard)
+  panelEmpresaWrapper.classList.toggle("hidden", esSupercard);
+  razonSocialSupercardWrapper.classList.toggle("hidden", !esSupercard);
+  clienteSupercardWrapper.classList.toggle("hidden", !esSupercard);
+  document.getElementById("panelEmpresa").required = !esSupercard;
+  document.getElementById("razonSocialSupercardSelect").required = esSupercard;
+
+  // Limpiar selects/inputs dependientes de empresa
+  document.getElementById("razonSocial").value = "";
+  document.getElementById("rutEmpresa").value = "";
+  document.getElementById("idPanelHidden").value = "";
+  nombreClienteSelect.innerHTML = '<option value="">Selecciona contacto</option>';
+  emailClienteInput.value = "";
+  document.getElementById("panelEmpresa").innerHTML = '<option value="">Escribe para buscar empresa...</option>';
+  activarBusquedaPanel();
+
+  if (esSupercard) {
+    // País fijo Colombia, visible pero bloqueado
+    paisSelect.value = "Colombia";
+    paisSelect.classList.add("campo-bloqueado");
+    // Sucursal fija "Administrador", visible pero bloqueada
+    sucursalSelect.innerHTML = '<option value="0">Administrador (0)</option>';
+    sucursalSelect.value = "0";
+    sucursalSelect.classList.add("campo-bloqueado");
+    document.getElementById("nombreSucursalHidden").value = "Administrador";
+    // Tipo de Gift Card fijo Supercard, bloqueado
+    tipoGCSelect.value = "Supercard";
+    tipoGCSelect.classList.add("campo-bloqueado");
+    cargarEmpresasSupercard();
+  } else {
+    paisSelect.classList.remove("campo-bloqueado");
+    sucursalSelect.classList.remove("campo-bloqueado");
+    sucursalSelect.innerHTML = '<option value="">Selecciona sucursal</option>';
+    document.getElementById("nombreSucursalHidden").value = "";
+    tipoGCSelect.classList.remove("campo-bloqueado");
+    if (tipoGCSelect.value === "Supercard") tipoGCSelect.value = "";
+    paisSelect.value = "";
+    empresasCache = [];
+  }
+
+  // Limpiar gift cards / supercards cargadas al cambiar de producto
+  document.getElementById("giftCardFields").innerHTML = "";
+  calcularTotal();
+
+  // Renombrar sección y botón
+  document.getElementById("giftCardsSectionTitle").innerHTML = esSupercard ? "🎁 Supercard" : "🎁 Gift Cards";
+  document.getElementById("addGiftCardBtn").textContent = esSupercard ? "➕ Agregar Supercard manual" : "➕ Agregar Gift Card manual";
+  document.getElementById("btnPlantilla").disabled = esSupercard ? true : !paisSelect.value;
+}
+async function cargarEmpresasSupercard() {
+  try {
+    const res = await fetch(`${API_URL_EMPRESAS}?pais=Colombia&producto=supercard`);
+    const data = await res.json();
+    supercardEmpresasCache = data.empresas || [];
+    const select = document.getElementById("razonSocialSupercardSelect");
+    select.innerHTML = '<option value="">Selecciona razón social</option>' +
+      supercardEmpresasCache.map(e => `<option value="${e.razonSocial}">${e.razonSocial}</option>`).join('');
+  } catch (err) {
+    showToast("Error cargando razones sociales de Supercard.", "error");
+  }
+}
+document.getElementById("razonSocialSupercardSelect").addEventListener("change", function () {
+  const empresa = supercardEmpresasCache.find(e => e.razonSocial === this.value);
+  const nombreClienteSelect = document.getElementById("nombreClienteSelect");
+  const emailClienteInput = document.getElementById("emailClienteInput");
+  if (!empresa) {
+    document.getElementById("razonSocial").value = "";
+    document.getElementById("rutEmpresa").value = "";
+    nombreClienteSelect.innerHTML = '<option value="">Selecciona contacto</option>';
+    emailClienteInput.value = "";
+    return;
+  }
+  document.getElementById("razonSocial").value = empresa.razonSocial || "";
+  document.getElementById("rutEmpresa").value = empresa.rut || "";
+  nombreClienteSelect.innerHTML = '<option value="">Selecciona contacto</option>' +
+    (empresa.contactos || []).map(c => `<option value="${c.nombre}" data-email="${c.email}">${c.nombre}</option>`).join('');
+  emailClienteInput.value = "";
+});
+document.getElementById("nombreClienteSelect").addEventListener("change", function () {
+  const opt = this.selectedOptions[0];
+  document.getElementById("emailClienteInput").value = opt ? (opt.dataset.email || "") : "";
+});
 /* ============================================================
    EMPRESAS & PANEL
 ============================================================ */
@@ -1206,7 +1234,6 @@ function activarBusquedaPanel() {
     allowEmptyOption: true
   });
 }
-
 async function cargarEmpresasPorPais(pais, empresaSeleccionada = null, sucursalSeleccionada = null) {
   if (!pais) return;
   try {
@@ -1244,11 +1271,10 @@ async function cargarEmpresasPorPais(pais, empresaSeleccionada = null, sucursalS
     showToast("Error cargando empresas. Intenta nuevamente.", "error");
   }
 }
-
 document.getElementById("pais").addEventListener("change", function () {
+  if (productoActual === "supercard") return;
   cargarEmpresasPorPais(this.value);
 });
-
 document.getElementById("panelEmpresa").addEventListener("change", function () {
   const empresa = empresasCache.find(e => e.nombreEmpresa === this.value);
   if (!empresa) return;
@@ -1270,14 +1296,12 @@ document.getElementById("panelEmpresa").addEventListener("change", function () {
     sucursalSelect.appendChild(opt);
   });
 });
-
 document.getElementById("sucursalSelect").addEventListener("change", function () {
   const selectedOption = this.options[this.selectedIndex];
   if (!selectedOption) return;
   const nombreSucursal = this.value === "0" ? "Administrador" : (selectedOption.dataset.nombre || "");
   document.getElementById("nombreSucursalHidden").value = nombreSucursal;
 });
-
 /* ============================================================
    BUSCAR PEDIDO
 ============================================================ */
@@ -1331,22 +1355,21 @@ async function buscarPedido() {
     await showAlert("Error al buscar el pedido. Verifica la conexión.", { icon: '❌', title: 'Error de conexión' });
   }
 }
-
 /* ============================================================
    ADD GIFT CARD GROUP
 ============================================================ */
 let gcCounter = 0;
-
 async function addGiftCardGroup(prefill = {}) {
+  if (productoActual === "supercard") {
+    return addSupercardGroup(prefill);
+  }
   const pais = document.getElementById("pais").value;
   if (!pais) {
     await showAlert("Selecciona el país antes de agregar gift cards.", { icon: '🌎', title: 'País requerido' });
     return;
   }
-
   gcCounter++;
   const num = gcCounter;
-
   const wrapper = document.createElement("div");
   wrapper.className = "gift-card-group";
   wrapper.innerHTML = `
@@ -1382,14 +1405,11 @@ async function addGiftCardGroup(prefill = {}) {
     <div class="warning hidden">⚠️ Esta solicitud dejará el stock en 30% o menos.</div>
     <div class="comentario-warning hidden"></div>
   `;
-
   document.getElementById("giftCardFields").appendChild(wrapper);
-
   wrapper.querySelector(".delete-btn").addEventListener("click", async () => {
     const ok = await showConfirm("¿Eliminar esta gift card del pedido?", { icon: '🗑', title: 'Eliminar gift card' });
     if (ok) { wrapper.remove(); calcularTotal(); }
   });
-
   const gift = wrapper.querySelector(".giftcard-select");
   const montoContainer = wrapper.querySelector(".monto-container");
   const stock = wrapper.querySelector(".stock-input");
@@ -1399,20 +1419,16 @@ async function addGiftCardGroup(prefill = {}) {
   const idInternoInput = wrapper.querySelector(".id-interno-input");
   const comisionInput = wrapper.querySelector(".comision-input");
   const descuentoInput = wrapper.querySelector(".descuento-input");
-
   if (idInternoInput) idInternoInput.value = prefill.idInterno ? String(prefill.idInterno) : "";
   if (prefill.comision) comisionInput.value = String(prefill.comision);
   if (prefill.descuento) descuentoInput.value = String(prefill.descuento);
-
   const modo = document.getElementById("modoPedidoHidden")?.value;
   const idPedidoActual = document.getElementById("idPedido")?.value;
   if (modo === "modificar" && idPedidoActual && !idInternoInput.value) {
     const existentes = Array.from(document.querySelectorAll('input[name="idInterno[]"]')).filter(i => i.value);
     idInternoInput.value = `${idPedidoActual}_${existentes.length + 1}`;
   }
-
   await cargarGiftCards(gift);
-
   if (prefill.giftCard) {
     const exists = Array.from(gift.options).some(o => o.value === prefill.giftCard || o.textContent === prefill.giftCard);
     if (!exists) {
@@ -1424,11 +1440,9 @@ async function addGiftCardGroup(prefill = {}) {
   }
   if (prefill.fuente) fuente.value = prefill.fuente;
   if (prefill.cantidad) cantidad.value = Number(prefill.cantidad);
-
   gift.addEventListener("change", async e => {
     if (fuente.value === "Catálogo") await cargarMontos(montoContainer, stock, e.target.value);
   });
-
   fuente.addEventListener("change", async () => {
     stock.value = ""; stock.dataset.original = "";
     warning.classList.add("hidden");
@@ -1452,7 +1466,6 @@ async function addGiftCardGroup(prefill = {}) {
     }
     calcularTotal();
   });
-
   cantidad.addEventListener("input", () => {
     if (fuente.value !== "Catálogo") { calcularTotal(); return; }
     const original = Number(stock.dataset.original);
@@ -1461,25 +1474,93 @@ async function addGiftCardGroup(prefill = {}) {
     else { warning.classList.toggle("hidden", (original - cant) / original > 0.3); }
     calcularTotal();
   });
-
   fuente.dispatchEvent(new Event("change"));
 }
+/* ============================================================
+   ADD SUPERCARD GROUP
+============================================================ */
+async function addSupercardGroup(prefill = {}) {
+  gcCounter++;
+  const num = gcCounter;
+  const wrapper = document.createElement("div");
+  wrapper.className = "gift-card-group";
+  wrapper.innerHTML = `
+    <div class="gc-header">
+      <div class="gc-title">
+        <span class="gc-badge">${num}</span>
+        Supercard #${num}
+      </div>
+      <button type="button" class="delete-btn">🗑 Eliminar</button>
+    </div>
+    <label>Supercard</label>
+    <select class="giftcard-select" name="giftCard[]" required>
+      <option value="">Selecciona Supercard</option>
+    </select>
+    <input type="hidden" name="fuente[]" value="Supercard">
+    <label>ID Interno</label>
+    <input class="id-interno-input" name="idInterno[]" readonly />
+    <label>Monto Supercard</label>
+    <input type="number" name="monto[]" class="monto-supercard-input" placeholder="Ingresa monto libre" required />
+    <label>Cantidad</label>
+    <input type="number" class="cantidad-input" name="cantidad[]" min="1" required placeholder="Ej: 10" />
+    <label>Comisión (%) <span class="campo-opcional">opcional</span> <i class="tip" data-tip="Porcentaje de comisión sobre el subtotal de esta Supercard. Se suma al total del pedido. Ej: 5% sobre $100.000 agrega $5.000.">?</i></label>
+    <input type="text" class="comision-input" name="comision[]" placeholder="Ej: 5%" oninput="calcularTotal()" onblur="formatearPorcentaje(this)" />
+    <div class="comision-info"></div>
+    <label>Descuento (%) <span class="campo-opcional">opcional</span> <i class="tip" data-tip="Porcentaje de descuento sobre el subtotal de esta Supercard. Se resta del total del pedido. Ej: 10% sobre $100.000 descuenta $10.000.">?</i></label>
+    <input type="text" class="descuento-input" name="descuento[]" placeholder="Ej: 10%" oninput="calcularTotal()" onblur="formatearPorcentaje(this)" />
+    <div class="descuento-info"></div>
+  `;
+  document.getElementById("giftCardFields").appendChild(wrapper);
+  wrapper.querySelector(".delete-btn").addEventListener("click", async () => {
+    const ok = await showConfirm("¿Eliminar esta Supercard del pedido?", { icon: '🗑', title: 'Eliminar Supercard' });
+    if (ok) { wrapper.remove(); calcularTotal(); }
+  });
+  const giftSel = wrapper.querySelector(".giftcard-select");
+  const idInternoInput = wrapper.querySelector(".id-interno-input");
+  const montoInput = wrapper.querySelector(".monto-supercard-input");
+  const cantidad = wrapper.querySelector(".cantidad-input");
+  const comisionInput = wrapper.querySelector(".comision-input");
+  const descuentoInput = wrapper.querySelector(".descuento-input");
 
+  if (idInternoInput) idInternoInput.value = prefill.idInterno ? String(prefill.idInterno) : "";
+  if (prefill.comision) comisionInput.value = String(prefill.comision);
+  if (prefill.descuento) descuentoInput.value = String(prefill.descuento);
+  if (prefill.cantidad) cantidad.value = Number(prefill.cantidad);
+  if (prefill.monto !== undefined && prefill.monto !== null && prefill.monto !== "") {
+    montoInput.value = Number(prefill.monto);
+  }
+
+  await cargarGiftCards(giftSel);
+  if (prefill.giftCard) {
+    const exists = Array.from(giftSel.options).some(o => o.value === prefill.giftCard);
+    if (!exists) {
+      const o = document.createElement("option");
+      o.value = prefill.giftCard; o.textContent = prefill.giftCard;
+      giftSel.appendChild(o);
+    }
+    giftSel.value = prefill.giftCard;
+  }
+
+  montoInput.addEventListener("input", calcularTotal);
+  cantidad.addEventListener("input", calcularTotal);
+}
 /* ============================================================
    CARGAR GIFT CARDS
 ============================================================ */
 async function cargarGiftCards(select) {
   const pais = document.getElementById("pais").value;
+  const params = new URLSearchParams({ pais });
+  if (productoActual === "supercard") params.set("producto", "supercard");
   try {
-    const res = await fetch(`${API_URL_STOCK}?pais=${encodeURIComponent(pais)}`);
+    const res = await fetch(`${API_URL_STOCK}?${params.toString()}`);
     const data = await res.json();
-    select.innerHTML = `<option value="">Selecciona gift card</option>` +
+    const placeholder = productoActual === "supercard" ? "Selecciona Supercard" : "Selecciona gift card";
+    select.innerHTML = `<option value="">${placeholder}</option>` +
       (data.giftCards || []).map(g => `<option value="${String(g)}">${String(g)}</option>`).join('');
   } catch {
-    showToast("Error cargando gift cards disponibles.", "error");
+    showToast("Error cargando opciones disponibles.", "error");
   }
 }
-
 async function cargarMontos(container, stock, giftCard) {
   container.innerHTML = `<select class="monto-select" name="monto[]" required></select>`;
   const select = container.querySelector("select");
@@ -1516,7 +1597,6 @@ async function cargarMontos(container, stock, giftCard) {
     showToast("Error cargando montos para esta gift card.", "error");
   }
 }
-
 /* ============================================================
    BULK UPLOAD
 ============================================================ */
@@ -1545,13 +1625,12 @@ document.getElementById("bulkUpload").addEventListener("change", e => {
   };
   reader.readAsArrayBuffer(file);
 });
-
 document.getElementById("pais").addEventListener("change", () => {
+  if (productoActual === "supercard") return;
   document.getElementById("giftCardFields").innerHTML = "";
   calcularTotal();
   document.getElementById("btnPlantilla").disabled = !document.getElementById("pais").value;
 });
-
 /* ============================================================
    DESCARGAR PLANTILLA EXCEL (dropdowns via JSZip + named range)
 ============================================================ */
@@ -1561,11 +1640,9 @@ async function descargarPlantilla() {
     await showAlert("Selecciona el país primero.", { icon: '🌎', title: 'País requerido' });
     return;
   }
-
   const btn = document.getElementById("btnPlantilla");
   btn.disabled = true;
   btn.textContent = "⏳ Generando...";
-
   try {
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet([
@@ -1583,7 +1660,6 @@ async function descargarPlantilla() {
     btn.textContent = "📥 Plantilla";
   }
 }
-
 /* ============================================================
    FORM SUBMIT
 ============================================================ */
