@@ -1171,6 +1171,7 @@ function aplicarModoProducto(valor) {
     // Tipo de Gift Card fijo Supercard, bloqueado
     tipoGCSelect.value = "Supercard";
     tipoGCSelect.classList.add("campo-bloqueado");
+    activarBusquedaRazonSocialSupercard();
     cargarEmpresasSupercard();
   } else {
     paisSelect.classList.remove("campo-bloqueado");
@@ -1206,10 +1207,14 @@ async function cargarEmpresasSupercard() {
     const res = await fetch(`${API_URL_EMPRESAS}?pais=Colombia&producto=supercard`);
     const data = await res.json();
     supercardEmpresasCache = data.empresas || [];
-    const select = document.getElementById("razonSocialSupercardSelect");
-    select.innerHTML = '<option value="">Selecciona razón social</option>' +
-      supercardEmpresasCache.map(e => `<option value="${e.razonSocial}">${e.razonSocial}</option>`).join('');
-    activarBusquedaRazonSocialSupercard();
+    if (razonSocialTomSelect) {
+      // Repoblar opciones sin destruir la instancia (mantiene el buscador activo)
+      razonSocialTomSelect.clearOptions();
+      razonSocialTomSelect.addOption(
+        supercardEmpresasCache.map(e => ({ value: e.razonSocial, text: e.razonSocial }))
+      );
+      razonSocialTomSelect.refreshOptions(false);
+    }
   } catch (err) {
     showToast("Error cargando razones sociales de Supercard.", "error");
   }
