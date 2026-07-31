@@ -796,7 +796,7 @@ input.input-error {
     <label class="file-label" id="adjuntoLabel">
       <span class="file-icon">📎</span>
       <span id="adjuntoText">Seleccionar archivos adjuntos (OC, HES, etc.)</span>
-      <input type="file" name="adjunto[]" id="adjuntoInput" multiple required />
+      <input type="file" name="adjunto[]" id="adjuntoInput" multiple />
     </label>
     <div class="file-name" id="adjuntoNames"></div>
     <button type="submit" class="btn-submit">🚀 Enviar pedido</button>
@@ -1682,12 +1682,24 @@ async function descargarPlantilla() {
    FORM SUBMIT
 ============================================================ */
 document.getElementById("mainForm").addEventListener("submit", async e => {
+  e.preventDefault(); // Controlamos el envío manualmente (AJAX) para no salir del formulario
+
   const grupos = document.querySelectorAll(".gift-card-group");
   if (grupos.length === 0) {
-    e.preventDefault();
     await showAlert("Agrega al menos una gift card antes de enviar.", { icon: '🎁', title: 'Sin gift cards' });
     return;
   }
+
+  // Validar archivo adjunto (el input está oculto por diseño, así que la validación nativa no avisa)
+  const adjuntoInput = document.getElementById("adjuntoInput");
+  if (!adjuntoInput.files || adjuntoInput.files.length === 0) {
+    await showAlert(
+      "Debes adjuntar al menos un archivo (OC, HES, etc.) antes de enviar el pedido.",
+      { icon: '📎', title: 'Pendiente archivo adjunto' }
+    );
+    return;
+  }
+
   // Validate % fields: must be X% format if filled
   let camposPctInvalidos = [];
   grupos.forEach((g, i) => {
@@ -1697,12 +1709,39 @@ document.getElementById("mainForm").addEventListener("submit", async e => {
     if (desc && !desc.endsWith('%')) camposPctInvalidos.push(`Gift Card #${i+1} — Descuento`);
   });
   if (camposPctInvalidos.length > 0) {
-    e.preventDefault();
     await showAlert(
       `Los siguientes campos deben estar en formato <strong>X%</strong> (Ej: 5%):<br><br>${camposPctInvalidos.join('<br>')}`,
       { icon: '⚠️', title: 'Formato incorrecto' }
     );
     return;
+  }
+
+  const form = e.target;
+  const submitBtn = form.querySelector(".btn-submit");
+  const textoOriginal = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = "⏳ Enviando pedido...";
+
+  try {
+    const formData = new FormData(form);
+    const res = await fetch(form.action, { method: "POST", body: formData });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    await showModal({
+      icon: '✅',
+      title: 'Pedido enviado',
+      message: 'Tu pedido fue enviado correctamente. El equipo de Apprecio lo procesará a la brevedad.',
+      buttons: [{ label: 'Entendido', cls: 'primary', value: true }]
+    });
+    location.reload();
+  } catch (err) {
+    await showAlert(
+      "Ocurrió un error al enviar el pedido. Verifica tu conexión e intenta nuevamente.",
+      { icon: '❌', title: 'Error al enviar' }
+    );
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = textoOriginal;
   }
 });
 </script>
