@@ -1075,7 +1075,8 @@ function limpiarFormularioCompleto() {
   document.querySelectorAll("textarea").forEach(t => t.value = "");
   document.getElementById("giftCardFields").innerHTML = "";
   document.getElementById("idPedido").value = "";
-  document.getElementById("panelEmpresa").innerHTML = '<option value="">Escribe para buscar empresa...</option>';
+  if (panelTomSelect) { panelTomSelect.clear(true); panelTomSelect.clearOptions(); panelTomSelect.refreshOptions(false); }
+  else { document.getElementById("panelEmpresa").innerHTML = '<option value="">Escribe para buscar empresa...</option>'; }
   document.getElementById("sucursalSelect").innerHTML = '<option value="">Selecciona sucursal</option>';
   document.getElementById("resumenPedido").style.display = "none";
   empresasCache = [];
@@ -1154,8 +1155,9 @@ function aplicarModoProducto(valor) {
   document.getElementById("idPanelHidden").value = "";
   nombreClienteSelect.innerHTML = '<option value="">Selecciona contacto</option>';
   emailClienteInput.value = "";
-  document.getElementById("panelEmpresa").innerHTML = '<option value="">Escribe para buscar empresa...</option>';
   activarBusquedaPanel();
+  if (panelTomSelect) { panelTomSelect.clear(true); panelTomSelect.clearOptions(); panelTomSelect.refreshOptions(false); }
+  empresasCache = [];
   if (razonSocialTomSelect) { razonSocialTomSelect.destroy(); razonSocialTomSelect = null; }
   document.getElementById("razonSocialSupercardSelect").innerHTML = '<option value="">Selecciona razón social</option>';
 
@@ -1244,13 +1246,15 @@ document.getElementById("nombreClienteSelect").addEventListener("change", functi
    EMPRESAS & PANEL
 ============================================================ */
 function activarBusquedaPanel() {
-  if (panelTomSelect) panelTomSelect.destroy();
-  panelTomSelect = new TomSelect("#panelEmpresa", {
-    create: false,
-    sortField: { field: "text", direction: "asc" },
-    placeholder: "Escribe para buscar empresa...",
-    allowEmptyOption: true
-  });
+  // Inicializa TomSelect una sola vez; las siguientes veces solo se actualizan sus opciones
+  if (!panelTomSelect) {
+    panelTomSelect = new TomSelect("#panelEmpresa", {
+      create: false,
+      sortField: { field: "text", direction: "asc" },
+      placeholder: "Escribe para buscar empresa...",
+      allowEmptyOption: true
+    });
+  }
 }
 async function cargarEmpresasPorPais(pais, empresaSeleccionada = null, sucursalSeleccionada = null) {
   if (!pais) return;
@@ -1258,15 +1262,20 @@ async function cargarEmpresasPorPais(pais, empresaSeleccionada = null, sucursalS
     const res = await fetch(`${API_URL_EMPRESAS}?pais=${encodeURIComponent(pais)}`);
     const data = await res.json();
     empresasCache = data.empresas || [];
-    const panelSelect = document.getElementById("panelEmpresa");
-    panelSelect.innerHTML = '<option value="">Escribe para buscar empresa...</option>';
-    empresasCache.forEach(emp => {
-      const opt = document.createElement("option");
-      opt.value = emp.nombreEmpresa;
-      opt.textContent = emp.nombreEmpresa;
-      panelSelect.appendChild(opt);
-    });
+
+    // Limpiar campos dependientes de la empresa del país anterior
+    document.getElementById("razonSocial").value = "";
+    document.getElementById("rutEmpresa").value = "";
+    document.getElementById("idPanelHidden").value = "";
+    document.getElementById("sucursalSelect").innerHTML = '<option value="">Selecciona sucursal</option>';
+
     activarBusquedaPanel();
+    // Repoblar opciones del TomSelect ya activo (en vez de destruir/recrear)
+    panelTomSelect.clear(true);
+    panelTomSelect.clearOptions();
+    panelTomSelect.addOption(empresasCache.map(emp => ({ value: emp.nombreEmpresa, text: emp.nombreEmpresa })));
+    panelTomSelect.refreshOptions(false);
+
     if (empresaSeleccionada) {
       panelTomSelect.setValue(empresaSeleccionada);
       const empresa = empresasCache.find(e => e.nombreEmpresa === empresaSeleccionada);
