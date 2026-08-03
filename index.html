@@ -707,8 +707,15 @@ input.input-error {
           <select id="nombreClienteSelect" name="nombreCliente">
             <option value="">Selecciona contacto</option>
           </select>
+          <input id="nombreClienteManual" name="nombreCliente" placeholder="Nombre del contacto" class="hidden" disabled />
           <label>Email del Cliente</label>
           <input id="emailClienteInput" name="emailCliente" readonly />
+        </div>
+        <div id="empresaManualToggleWrapper" class="hidden">
+          <button type="button" class="btn-plantilla" id="toggleManualSupercardBtn" style="width:100%;margin-top:10px;">
+            🆕 ¿Empresa nueva? Agregar datos manualmente
+          </button>
+          <p class="plantilla-hint visible">Usa esto solo si es la primera compra de esta empresa y aún no aparece en el listado.</p>
         </div>
         <div class="help-link-box">
           <span>¿No aparece la empresa o sucursal?</span>
@@ -945,6 +952,7 @@ let panelTomSelect = null;
 let productoActual = "giftcard";
 let supercardEmpresasCache = []; // [{ razonSocial, rut, contactos: [{nombre, email}] }]
 let razonSocialTomSelect = null;
+let modoManualSupercard = false;
 /* ============================================================
    UTILS
 ============================================================ */
@@ -1143,9 +1151,11 @@ function aplicarModoProducto(valor) {
   const emailClienteInput = document.getElementById("emailClienteInput");
 
   // Toggle Panel Empresa <-> Razón Social (Supercard)
+  activarModoManualSupercard(false); // siempre partir en modo búsqueda al cambiar de producto
   panelEmpresaWrapper.classList.toggle("hidden", esSupercard);
   razonSocialSupercardWrapper.classList.toggle("hidden", !esSupercard);
   clienteSupercardWrapper.classList.toggle("hidden", !esSupercard);
+  document.getElementById("empresaManualToggleWrapper").classList.toggle("hidden", !esSupercard);
   document.getElementById("panelEmpresa").required = !esSupercard;
   document.getElementById("razonSocialSupercardSelect").required = esSupercard;
 
@@ -1195,6 +1205,65 @@ function aplicarModoProducto(valor) {
   document.getElementById("addGiftCardBtn").textContent = esSupercard ? "➕ Agregar Supercard manual" : "➕ Agregar Gift Card manual";
   document.getElementById("btnPlantilla").disabled = esSupercard ? true : !paisSelect.value;
 }
+function activarModoManualSupercard(activar) {
+  modoManualSupercard = activar;
+  const razonInput = document.getElementById("razonSocial");
+  const rutInput = document.getElementById("rutEmpresa");
+  const emailInput = document.getElementById("emailClienteInput");
+  const nombreSelect = document.getElementById("nombreClienteSelect");
+  const nombreManual = document.getElementById("nombreClienteManual");
+  const dropdownWrapper = document.getElementById("razonSocialSupercardWrapper");
+  const toggleBtn = document.getElementById("toggleManualSupercardBtn");
+  if (!razonInput || !toggleBtn) return;
+
+  // Siempre partir limpio al cambiar de modo
+  razonInput.value = "";
+  rutInput.value = "";
+  emailInput.value = "";
+  nombreSelect.innerHTML = '<option value="">Selecciona contacto</option>';
+  nombreManual.value = "";
+  if (razonSocialTomSelect) razonSocialTomSelect.clear(true);
+
+  const razonSocialSelect = document.getElementById("razonSocialSupercardSelect");
+
+  if (activar) {
+    dropdownWrapper.classList.add("hidden");
+    if (razonSocialSelect) razonSocialSelect.required = false;
+    razonInput.removeAttribute("readonly");
+    razonInput.placeholder = "Escribe la razón social";
+    rutInput.removeAttribute("readonly");
+    rutInput.placeholder = "Escribe el ID tributario";
+    emailInput.removeAttribute("readonly");
+    emailInput.type = "email";
+    emailInput.placeholder = "correo@cliente.com";
+
+    nombreSelect.classList.add("hidden");
+    nombreSelect.disabled = true;
+    nombreManual.classList.remove("hidden");
+    nombreManual.disabled = false;
+
+    toggleBtn.textContent = "🔍 Volver a buscar empresa existente";
+  } else {
+    dropdownWrapper.classList.remove("hidden");
+    // El required de razonSocialSelect lo controla aplicarModoProducto según el producto activo
+    razonInput.setAttribute("readonly", true);
+    razonInput.placeholder = "";
+    rutInput.setAttribute("readonly", true);
+    rutInput.placeholder = "";
+    emailInput.setAttribute("readonly", true);
+    emailInput.placeholder = "";
+
+    nombreSelect.classList.remove("hidden");
+    nombreSelect.disabled = false;
+    nombreManual.classList.add("hidden");
+    nombreManual.disabled = true;
+
+    toggleBtn.textContent = "🆕 ¿Empresa nueva? Agregar datos manualmente";
+  }
+}
+document.getElementById("toggleManualSupercardBtn").addEventListener("click", () => {
+  activarModoManualSupercard(!modoManualSupercard);
+});
 function activarBusquedaRazonSocialSupercard() {
   if (razonSocialTomSelect) razonSocialTomSelect.destroy();
   razonSocialTomSelect = new TomSelect("#razonSocialSupercardSelect", {
