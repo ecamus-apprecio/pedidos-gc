@@ -708,6 +708,9 @@ input.input-error {
             <option value="">Selecciona contacto</option>
           </select>
           <input id="nombreClienteManual" name="nombreCliente" placeholder="Nombre del contacto" class="hidden" disabled />
+          <button type="button" class="btn-plantilla hidden" id="volverContactoBtn" style="width:100%;margin-top:8px;font-size:12px;padding:8px 12px;">
+            🔍 Volver a seleccionar contacto existente
+          </button>
           <label>Email del Cliente</label>
           <input id="emailClienteInput" name="emailCliente" readonly />
         </div>
@@ -953,6 +956,7 @@ let productoActual = "giftcard";
 let supercardEmpresasCache = []; // [{ razonSocial, rut, contactos: [{nombre, email}] }]
 let razonSocialTomSelect = null;
 let modoManualSupercard = false;
+let modoManualCliente = false; // contacto nuevo para una empresa Supercard ya existente
 /* ============================================================
    UTILS
 ============================================================ */
@@ -1163,6 +1167,7 @@ function aplicarModoProducto(valor) {
   document.getElementById("razonSocial").value = "";
   document.getElementById("rutEmpresa").value = "";
   document.getElementById("idPanelHidden").value = "";
+  activarModoManualCliente(false);
   nombreClienteSelect.innerHTML = '<option value="">Selecciona contacto</option>';
   emailClienteInput.value = "";
   activarBusquedaPanel();
@@ -1222,6 +1227,8 @@ function activarModoManualSupercard(activar) {
   emailInput.value = "";
   nombreSelect.innerHTML = '<option value="">Selecciona contacto</option>';
   nombreManual.value = "";
+  modoManualCliente = false;
+  document.getElementById("volverContactoBtn")?.classList.add("hidden");
   if (razonSocialTomSelect) razonSocialTomSelect.clear(true);
 
   const razonSocialSelect = document.getElementById("razonSocialSupercardSelect");
@@ -1294,6 +1301,7 @@ document.getElementById("razonSocialSupercardSelect").addEventListener("change",
   const empresa = supercardEmpresasCache.find(e => e.razonSocial === this.value);
   const nombreClienteSelect = document.getElementById("nombreClienteSelect");
   const emailClienteInput = document.getElementById("emailClienteInput");
+  activarModoManualCliente(false); // al cambiar de empresa, siempre volvemos a modo selección de contacto
   if (!empresa) {
     document.getElementById("razonSocial").value = "";
     document.getElementById("rutEmpresa").value = "";
@@ -1304,13 +1312,54 @@ document.getElementById("razonSocialSupercardSelect").addEventListener("change",
   document.getElementById("razonSocial").value = empresa.razonSocial || "";
   document.getElementById("rutEmpresa").value = empresa.rut || "";
   nombreClienteSelect.innerHTML = '<option value="">Selecciona contacto</option>' +
-    (empresa.contactos || []).map(c => `<option value="${c.nombre}" data-email="${c.email}">${c.nombre}</option>`).join('');
+    (empresa.contactos || []).map(c => `<option value="${c.nombre}" data-email="${c.email}">${c.nombre}</option>`).join('') +
+    '<option value="__nuevo_contacto__">➕ Nuevo contacto (no está en la lista)</option>';
   emailClienteInput.value = "";
 });
 document.getElementById("nombreClienteSelect").addEventListener("change", function () {
+  if (this.value === "__nuevo_contacto__") {
+    activarModoManualCliente(true);
+    return;
+  }
   const opt = this.selectedOptions[0];
   document.getElementById("emailClienteInput").value = opt ? (opt.dataset.email || "") : "";
 });
+// Permite escribir un contacto nuevo (nombre + email) para una empresa Supercard que ya existe en el listado
+function activarModoManualCliente(activar) {
+  modoManualCliente = activar;
+  const nombreSelect = document.getElementById("nombreClienteSelect");
+  const nombreManual = document.getElementById("nombreClienteManual");
+  const emailInput = document.getElementById("emailClienteInput");
+  const volverBtn = document.getElementById("volverContactoBtn");
+  if (!nombreSelect || !nombreManual || !emailInput || !volverBtn) return;
+
+  if (activar) {
+    nombreSelect.classList.add("hidden");
+    nombreSelect.disabled = true;
+    nombreManual.classList.remove("hidden");
+    nombreManual.disabled = false;
+    nombreManual.value = "";
+    nombreManual.focus();
+    emailInput.removeAttribute("readonly");
+    emailInput.type = "email";
+    emailInput.placeholder = "correo@cliente.com";
+    emailInput.value = "";
+    volverBtn.classList.remove("hidden");
+  } else {
+    nombreSelect.classList.remove("hidden");
+    nombreSelect.disabled = false;
+    if (nombreSelect.value === "__nuevo_contacto__") nombreSelect.selectedIndex = 0;
+    nombreManual.classList.add("hidden");
+    nombreManual.disabled = true;
+    nombreManual.value = "";
+    emailInput.setAttribute("readonly", true);
+    emailInput.type = "text";
+    emailInput.placeholder = "";
+    emailInput.value = "";
+    volverBtn.classList.add("hidden");
+  }
+}
+document.getElementById("volverContactoBtn").addEventListener("click", () => activarModoManualCliente(false));
 /* ============================================================
    EMPRESAS & PANEL
 ============================================================ */
