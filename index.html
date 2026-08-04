@@ -698,6 +698,7 @@ input.input-error {
         <input name="razon" id="razonSocial" readonly required />
         <label>ID Tributario</label>
         <input name="idTributario" id="rutEmpresa" readonly required />
+        <div class="warning hidden" id="avisoMultiplesRut">⚠️ Esta empresa cuenta con varios ID Tributario asociados a distintos interlocutores. Selecciona el interlocutor para completar este dato.</div>
         <label>Sucursal</label>
         <select name="sucursal" id="sucursalSelect" required>
           <option value="">Selecciona sucursal</option>
@@ -957,6 +958,7 @@ let supercardEmpresasCache = []; // [{ razonSocial, rut, contactos: [{nombre, em
 let razonSocialTomSelect = null;
 let modoManualSupercard = false;
 let modoManualCliente = false; // contacto nuevo para una empresa Supercard ya existente
+let empresaSupercardActual = null; // empresa Supercard seleccionada actualmente (puede tener varios ID Tributario)
 /* ============================================================
    UTILS
 ============================================================ */
@@ -1167,6 +1169,8 @@ function aplicarModoProducto(valor) {
   document.getElementById("razonSocial").value = "";
   document.getElementById("rutEmpresa").value = "";
   document.getElementById("idPanelHidden").value = "";
+  empresaSupercardActual = null;
+  document.getElementById("avisoMultiplesRut")?.classList.add("hidden");
   activarModoManualCliente(false);
   nombreClienteSelect.innerHTML = '<option value="">Selecciona contacto</option>';
   emailClienteInput.value = "";
@@ -1228,7 +1232,9 @@ function activarModoManualSupercard(activar) {
   nombreSelect.innerHTML = '<option value="">Selecciona contacto</option>';
   nombreManual.value = "";
   modoManualCliente = false;
+  empresaSupercardActual = null;
   document.getElementById("volverContactoBtn")?.classList.add("hidden");
+  document.getElementById("avisoMultiplesRut")?.classList.add("hidden");
   if (razonSocialTomSelect) razonSocialTomSelect.clear(true);
 
   const razonSocialSelect = document.getElementById("razonSocialSupercardSelect");
@@ -1299,20 +1305,29 @@ async function cargarEmpresasSupercard() {
 }
 document.getElementById("razonSocialSupercardSelect").addEventListener("change", function () {
   const empresa = supercardEmpresasCache.find(e => e.razonSocial === this.value);
+  empresaSupercardActual = empresa || null;
   const nombreClienteSelect = document.getElementById("nombreClienteSelect");
   const emailClienteInput = document.getElementById("emailClienteInput");
+  const avisoMultiplesRut = document.getElementById("avisoMultiplesRut");
   activarModoManualCliente(false); // al cambiar de empresa, siempre volvemos a modo selección de contacto
   if (!empresa) {
     document.getElementById("razonSocial").value = "";
     document.getElementById("rutEmpresa").value = "";
     nombreClienteSelect.innerHTML = '<option value="">Selecciona contacto</option>';
     emailClienteInput.value = "";
+    avisoMultiplesRut.classList.add("hidden");
     return;
   }
   document.getElementById("razonSocial").value = empresa.razonSocial || "";
-  document.getElementById("rutEmpresa").value = empresa.rut || "";
+
+  // Si la empresa tiene un solo ID Tributario, se autocompleta. Si tiene varios
+  // (distintas áreas/RUT por interlocutor), se deja en blanco hasta elegir contacto.
+  const tieneMultiplesRut = !!empresa.multiplesRut;
+  document.getElementById("rutEmpresa").value = tieneMultiplesRut ? "" : (empresa.rut || "");
+  avisoMultiplesRut.classList.toggle("hidden", !tieneMultiplesRut);
+
   nombreClienteSelect.innerHTML = '<option value="">Selecciona contacto</option>' +
-    (empresa.contactos || []).map(c => `<option value="${c.nombre}" data-email="${c.email}">${c.nombre}</option>`).join('') +
+    (empresa.contactos || []).map(c => `<option value="${c.nombre}" data-email="${c.email}" data-rut="${c.rut || ''}">${c.nombre}</option>`).join('') +
     '<option value="__nuevo_contacto__">➕ Nuevo contacto (no está en la lista)</option>';
   emailClienteInput.value = "";
 });
@@ -1323,6 +1338,10 @@ document.getElementById("nombreClienteSelect").addEventListener("change", functi
   }
   const opt = this.selectedOptions[0];
   document.getElementById("emailClienteInput").value = opt ? (opt.dataset.email || "") : "";
+  // Empresa con varios ID Tributario: el RUT correcto se completa según el interlocutor elegido
+  if (empresaSupercardActual && empresaSupercardActual.multiplesRut) {
+    document.getElementById("rutEmpresa").value = opt ? (opt.dataset.rut || "") : "";
+  }
 });
 // Permite escribir un contacto nuevo (nombre + email) para una empresa Supercard que ya existe en el listado
 function activarModoManualCliente(activar) {
@@ -1331,7 +1350,11 @@ function activarModoManualCliente(activar) {
   const nombreManual = document.getElementById("nombreClienteManual");
   const emailInput = document.getElementById("emailClienteInput");
   const volverBtn = document.getElementById("volverContactoBtn");
+  const rutInput = document.getElementById("rutEmpresa");
+  const avisoMultiplesRut = document.getElementById("avisoMultiplesRut");
   if (!nombreSelect || !nombreManual || !emailInput || !volverBtn) return;
+
+  const empresaAmbigua = !!(empresaSupercardActual && empresaSupercardActual.multiplesRut);
 
   if (activar) {
     nombreSelect.classList.add("hidden");
@@ -1345,6 +1368,13 @@ function activarModoManualCliente(activar) {
     emailInput.placeholder = "correo@cliente.com";
     emailInput.value = "";
     volverBtn.classList.remove("hidden");
+    // Empresa nueva a este listado o con varios RUT: el interlocutor nuevo requiere ID Tributario manual
+    if (rutInput && (empresaAmbigua || modoManualSupercard)) {
+      rutInput.removeAttribute("readonly");
+      rutInput.value = "";
+      rutInput.placeholder = "Escribe el ID tributario de este interlocutor";
+    }
+    if (avisoMultiplesRut) avisoMultiplesRut.classList.add("hidden");
   } else {
     nombreSelect.classList.remove("hidden");
     nombreSelect.disabled = false;
@@ -1357,6 +1387,13 @@ function activarModoManualCliente(activar) {
     emailInput.placeholder = "";
     emailInput.value = "";
     volverBtn.classList.add("hidden");
+    // Restaurar ID Tributario según la empresa seleccionada (solo si no estamos en modo empresa nueva)
+    if (rutInput && !modoManualSupercard) {
+      rutInput.setAttribute("readonly", true);
+      rutInput.placeholder = "";
+      rutInput.value = empresaAmbigua ? "" : (empresaSupercardActual ? (empresaSupercardActual.rut || "") : "");
+      if (avisoMultiplesRut) avisoMultiplesRut.classList.toggle("hidden", !empresaAmbigua);
+    }
   }
 }
 document.getElementById("volverContactoBtn").addEventListener("click", () => activarModoManualCliente(false));
