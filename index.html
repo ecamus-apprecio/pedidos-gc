@@ -1343,6 +1343,37 @@ document.getElementById("nombreClienteSelect").addEventListener("change", functi
     document.getElementById("rutEmpresa").value = opt ? (opt.dataset.rut || "") : "";
   }
 });
+/* ============================================================
+   VALIDACIÓN ID TRIBUTARIO / EMAIL EN MODO MANUAL (SUPERCARD)
+============================================================ */
+const REGEX_SOLO_NUMEROS = /^\d+$/;
+const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+function validarRutManual(input) {
+  if (!input || input.readOnly) { input?.classList.remove("input-error"); return true; }
+  const val = input.value.trim();
+  if (!val) { input.classList.remove("input-error"); return true; }
+  if (!REGEX_SOLO_NUMEROS.test(val)) {
+    input.classList.add("input-error");
+    showToast("El ID Tributario debe contener solo números, sin puntos ni guion.", "warning");
+    return false;
+  }
+  input.classList.remove("input-error");
+  return true;
+}
+function validarEmailManual(input) {
+  if (!input || input.readOnly) { input?.classList.remove("input-error"); return true; }
+  const val = input.value.trim();
+  if (!val) { input.classList.remove("input-error"); return true; }
+  if (!REGEX_EMAIL.test(val)) {
+    input.classList.add("input-error");
+    showToast("Ingresa un correo válido, con el formato correo@dominio.com", "warning");
+    return false;
+  }
+  input.classList.remove("input-error");
+  return true;
+}
+document.getElementById("rutEmpresa").addEventListener("blur", function () { validarRutManual(this); });
+document.getElementById("emailClienteInput").addEventListener("blur", function () { validarEmailManual(this); });
 // Permite escribir un contacto nuevo (nombre + email) para una empresa Supercard que ya existe en el listado
 function activarModoManualCliente(activar) {
   modoManualCliente = activar;
@@ -1852,6 +1883,22 @@ document.getElementById("mainForm").addEventListener("submit", async e => {
   if (grupos.length === 0) {
     await showAlert("Agrega al menos una gift card antes de enviar.", { icon: '🎁', title: 'Sin gift cards' });
     return;
+  }
+
+  // Validar ID Tributario / Email cuando se ingresan manualmente (Supercard: empresa o contacto nuevo)
+  if (productoActual === "supercard") {
+    const rutInput = document.getElementById("rutEmpresa");
+    const emailInput = document.getElementById("emailClienteInput");
+    if (!validarRutManual(rutInput)) {
+      await showAlert("El ID Tributario debe contener solo números, sin puntos ni guion. Corrígelo antes de enviar.", { icon: '⚠️', title: 'ID Tributario inválido' });
+      rutInput.focus();
+      return;
+    }
+    if (!validarEmailManual(emailInput)) {
+      await showAlert("El correo del cliente no tiene un formato válido. Debe incluir @ y dominio (ej: correo@empresa.com).", { icon: '⚠️', title: 'Correo inválido' });
+      emailInput.focus();
+      return;
+    }
   }
 
   // Validar archivo adjunto (el input está oculto por diseño, así que la validación nativa no avisa)
