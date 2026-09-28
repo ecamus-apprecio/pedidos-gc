@@ -69,7 +69,7 @@ body {
   padding: 10px 24px; border-radius: 8px;
   font-size: 14px; font-weight: 600;
   cursor: pointer; border: none;
-  transition: opacity 0.15s, transform 0.15s;
+  transition: opacity .15s, transform .15s;
   min-width: 100px;
 }
 .modal-btn:hover { opacity: 0.88; transform: translateY(-1px); }
@@ -951,6 +951,12 @@ const API_URL_EMPRESAS = "https://n8n.openip.cl/webhook/empresas";
 let empresasCache = [];
 let panelTomSelect = null;
 /* ============================================================
+   GIFT CARDS CON MONTO LIBRE DECIMAL
+   (catálogo, pero el monto no viene de una lista fija de montos
+   sino que se ingresa a mano y admite decimales)
+============================================================ */
+const GIFT_CARDS_MONTO_LIBRE_DECIMAL = ["7KGDEPAVO", "8KGDEPAVO", "9KGDEPAVO"];
+/* ============================================================
    PRODUCTO (Gift Cards / Supercard)
 ============================================================ */
 let productoActual = "giftcard";
@@ -1569,6 +1575,34 @@ async function buscarPedido() {
   }
 }
 /* ============================================================
+   CAMPO DE MONTO (según Fuente y, para Catálogo, según si la
+   gift card es de las que admiten monto libre con decimales)
+============================================================ */
+async function actualizarCampoMonto(montoContainer, stock, giftValue, montoPrefill) {
+  // Gift cards de monto libre decimal (ej. 7KGDEPAVO, 8KGDEPAVO, 9KGDEPAVO):
+  // no se consulta stock por monto, se ingresa el monto a mano y admite decimales.
+  if (GIFT_CARDS_MONTO_LIBRE_DECIMAL.includes(giftValue)) {
+    stock.value = ""; stock.dataset.original = "";
+    montoContainer.innerHTML = `<input type="number" step="any" min="0" name="monto[]" placeholder="Ingresa monto (admite decimales)" required />`;
+    const input = montoContainer.querySelector("input");
+    input.addEventListener("input", calcularTotal);
+    if (montoPrefill !== undefined && montoPrefill !== null && montoPrefill !== "") {
+      input.value = Number(montoPrefill);
+    }
+    return;
+  }
+  // Comportamiento normal: lista de montos disponibles según stock
+  montoContainer.innerHTML = `<select class="monto-select" name="monto[]" required></select>`;
+  if (giftValue) {
+    await cargarMontos(montoContainer, stock, giftValue);
+    if (montoPrefill !== undefined && montoPrefill !== null && montoPrefill !== "") {
+      const sel = montoContainer.querySelector("select");
+      sel.value = String(Number(montoPrefill));
+      sel.dispatchEvent(new Event("change"));
+    }
+  }
+}
+/* ============================================================
    ADD GIFT CARD GROUP
 ============================================================ */
 let gcCounter = 0;
@@ -1654,28 +1688,20 @@ async function addGiftCardGroup(prefill = {}) {
   if (prefill.fuente) fuente.value = prefill.fuente;
   if (prefill.cantidad) cantidad.value = Number(prefill.cantidad);
   gift.addEventListener("change", async e => {
-    if (fuente.value === "Catálogo") await cargarMontos(montoContainer, stock, e.target.value);
+    if (fuente.value === "Catálogo") await actualizarCampoMonto(montoContainer, stock, e.target.value);
   });
   fuente.addEventListener("change", async () => {
     stock.value = ""; stock.dataset.original = "";
     warning.classList.add("hidden");
     if (fuente.value === "Proveedor" || fuente.value === "GC Propia") {
       const placeholder = fuente.value === "GC Propia" ? "Ingresa monto (GC Propia)" : "Ingresa monto libre";
-      montoContainer.innerHTML = `<input type="number" name="monto[]" placeholder="${placeholder}" required />`;
+      montoContainer.innerHTML = `<input type="number" step="any" name="monto[]" placeholder="${placeholder}" required />`;
       montoContainer.querySelector("input").addEventListener("input", calcularTotal);
       if (prefill.monto !== undefined && prefill.monto !== null && prefill.monto !== "") {
         montoContainer.querySelector("input").value = Number(prefill.monto);
       }
     } else {
-      montoContainer.innerHTML = `<select class="monto-select" name="monto[]" required></select>`;
-      if (gift.value) {
-        await cargarMontos(montoContainer, stock, gift.value);
-        if (prefill.monto !== undefined && prefill.monto !== null && prefill.monto !== "") {
-          const sel = montoContainer.querySelector("select");
-          sel.value = String(Number(prefill.monto));
-          sel.dispatchEvent(new Event("change"));
-        }
-      }
+      await actualizarCampoMonto(montoContainer, stock, gift.value, prefill.monto);
     }
     calcularTotal();
   });
