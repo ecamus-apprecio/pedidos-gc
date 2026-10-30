@@ -545,7 +545,7 @@ input.input-error {
 }
 /* Hidden utility */
 .hidden { display: none !important; }
-/* Campo bloqueado (visible pero no editable, ej. País/Sucursal en Supercard) */
+/* Campo bloqueado (visible pero no editable, ej. Sucursal en Supercard) */
 .campo-bloqueado {
   background: #f5f5f5 !important; color: #888 !important;
   pointer-events: none !important; cursor: not-allowed !important;
@@ -655,7 +655,7 @@ input.input-error {
       </div>
       <div class="top-options" style="margin-top:4px;">
         <div class="option-group" style="max-width:340px;margin:0 auto;">
-          <label>Producto <i class="tip" data-tip="Gift Cards: catálogo tradicional de gift cards. Supercard: producto exclusivo Colombia con datos de contacto del cliente final.">?</i></label>
+          <label>Producto <i class="tip" data-tip="Gift Cards: catálogo tradicional de gift cards. Supercard: disponible para Chile y Colombia, con datos de contacto del cliente final.">?</i></label>
           <div class="toggle-group" id="productoToggle">
             <button type="button" class="toggle-btn active" data-value="giftcard">Gift Cards</button>
             <button type="button" class="toggle-btn" data-value="supercard">Supercard</button>
@@ -960,6 +960,7 @@ const GIFT_CARDS_MONTO_LIBRE_DECIMAL = ["7KGDEPAVO", "8KGDEPAVO", "9KGDEPAVO"];
    PRODUCTO (Gift Cards / Supercard)
 ============================================================ */
 let productoActual = "giftcard";
+const SUPERCARD_PAISES = ["Chile", "Colombia"]; // países donde está disponible Supercard
 let supercardEmpresasCache = []; // [{ razonSocial, rut, contactos: [{nombre, email}] }]
 let razonSocialTomSelect = null;
 let modoManualSupercard = false;
@@ -1187,9 +1188,9 @@ function aplicarModoProducto(valor) {
   document.getElementById("razonSocialSupercardSelect").innerHTML = '<option value="">Selecciona razón social</option>';
 
   if (esSupercard) {
-    // País fijo Colombia, visible pero bloqueado
-    paisSelect.value = "Colombia";
-    paisSelect.classList.add("campo-bloqueado");
+    // País: solo Chile o Colombia (los demás quedan deshabilitados)
+    Array.from(paisSelect.options).forEach(o => { if (o.value) o.disabled = !SUPERCARD_PAISES.includes(o.value); });
+    if (!SUPERCARD_PAISES.includes(paisSelect.value)) paisSelect.value = "";
     // Sucursal fija "Administrador", visible pero bloqueada
     sucursalSelect.innerHTML = '<option value="0">Administrador (0)</option>';
     sucursalSelect.value = "0";
@@ -1199,9 +1200,9 @@ function aplicarModoProducto(valor) {
     tipoGCSelect.value = "Supercard";
     tipoGCSelect.classList.add("campo-bloqueado");
     activarBusquedaRazonSocialSupercard();
-    cargarEmpresasSupercard();
+    if (paisSelect.value) cargarEmpresasSupercard(paisSelect.value);
   } else {
-    paisSelect.classList.remove("campo-bloqueado");
+    Array.from(paisSelect.options).forEach(o => { o.disabled = false; });
     sucursalSelect.classList.remove("campo-bloqueado");
     sucursalSelect.innerHTML = '<option value="">Selecciona sucursal</option>';
     document.getElementById("nombreSucursalHidden").value = "";
@@ -1292,10 +1293,14 @@ function activarBusquedaRazonSocialSupercard() {
     allowEmptyOption: true
   });
 }
-async function cargarEmpresasSupercard() {
+let supercardPaisSolicitado = null;
+async function cargarEmpresasSupercard(pais) {
+  if (!pais) return;
+  supercardPaisSolicitado = pais;
   try {
-    const res = await fetch(`${API_URL_EMPRESAS}?pais=Colombia&producto=supercard`);
+    const res = await fetch(`${API_URL_EMPRESAS}?pais=${encodeURIComponent(pais)}&producto=supercard`);
     const data = await res.json();
+    if (pais !== supercardPaisSolicitado || productoActual !== "supercard") return; // respuesta de un país anterior
     supercardEmpresasCache = data.empresas || [];
     if (razonSocialTomSelect) {
       // Repoblar opciones sin destruir la instancia (mantiene el buscador activo)
@@ -1354,13 +1359,36 @@ document.getElementById("nombreClienteSelect").addEventListener("change", functi
 ============================================================ */
 const REGEX_SOLO_NUMEROS = /^\d+$/;
 const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Chile: RUT sin puntos ni guion, con dígito verificador al final (igual que el sheet de Supercard CL, ej: 763390810)
+function esRutChileValido(rut) {
+  if (!/^\d{7,8}[\dK]$/.test(rut)) return false;
+  const cuerpo = rut.slice(0, -1);
+  const dv = rut.slice(-1);
+  let suma = 0, mult = 2;
+  for (let i = cuerpo.length - 1; i >= 0; i--) {
+    suma += Number(cuerpo[i]) * mult;
+    mult = mult === 7 ? 2 : mult + 1;
+  }
+  const res = 11 - (suma % 11);
+  const dvEsperado = res === 11 ? "0" : res === 10 ? "K" : String(res);
+  return dv === dvEsperado;
+}
+function mensajeIdTributarioInvalido() {
+  return document.getElementById("pais").value === "Chile"
+    ? "El RUT no es válido. Escríbelo sin puntos ni guion, con dígito verificador (ej: 763390810)."
+    : "El ID Tributario debe contener solo números, sin puntos ni guion.";
+}
 function validarRutManual(input) {
   if (!input || input.readOnly) { input?.classList.remove("input-error"); return true; }
+  const esChile = document.getElementById("pais").value === "Chile";
+  // En Chile se normaliza: se quitan puntos, guion y espacios, y la k pasa a mayúscula
+  if (esChile) input.value = input.value.replace(/[.\-\s]/g, "").toUpperCase();
   const val = input.value.trim();
   if (!val) { input.classList.remove("input-error"); return true; }
-  if (!REGEX_SOLO_NUMEROS.test(val)) {
+  const valido = esChile ? esRutChileValido(val) : REGEX_SOLO_NUMEROS.test(val);
+  if (!valido) {
     input.classList.add("input-error");
-    showToast("El ID Tributario debe contener solo números, sin puntos ni guion.", "warning");
+    showToast(mensajeIdTributarioInvalido(), "warning");
     return false;
   }
   input.classList.remove("input-error");
@@ -1491,9 +1519,23 @@ async function cargarEmpresasPorPais(pais, empresaSeleccionada = null, sucursalS
   }
 }
 document.getElementById("pais").addEventListener("change", function () {
-  if (productoActual === "supercard") return;
+  if (productoActual === "supercard") { cambiarPaisSupercard(this.value); return; }
   cargarEmpresasPorPais(this.value);
 });
+function cambiarPaisSupercard(pais) {
+  // Limpia empresa, contacto e ID Tributario del país anterior
+  activarModoManualSupercard(false);
+  supercardEmpresasCache = [];
+  if (razonSocialTomSelect) {
+    razonSocialTomSelect.clear(true);
+    razonSocialTomSelect.clearOptions();
+    razonSocialTomSelect.refreshOptions(false);
+  }
+  // Las Supercards disponibles cambian por país
+  document.getElementById("giftCardFields").innerHTML = "";
+  calcularTotal();
+  cargarEmpresasSupercard(pais);
+}
 document.getElementById("panelEmpresa").addEventListener("change", function () {
   const empresa = empresasCache.find(e => e.nombreEmpresa === this.value);
   if (!empresa) return;
@@ -1719,6 +1761,10 @@ async function addGiftCardGroup(prefill = {}) {
    ADD SUPERCARD GROUP
 ============================================================ */
 async function addSupercardGroup(prefill = {}) {
+  if (!document.getElementById("pais").value) {
+    await showAlert("Selecciona el país (Chile o Colombia) antes de agregar Supercards.", { icon: '🌎', title: 'País requerido' });
+    return;
+  }
   gcCounter++;
   const num = gcCounter;
   const wrapper = document.createElement("div");
@@ -1916,7 +1962,7 @@ document.getElementById("mainForm").addEventListener("submit", async e => {
     const rutInput = document.getElementById("rutEmpresa");
     const emailInput = document.getElementById("emailClienteInput");
     if (!validarRutManual(rutInput)) {
-      await showAlert("El ID Tributario debe contener solo números, sin puntos ni guion. Corrígelo antes de enviar.", { icon: '⚠️', title: 'ID Tributario inválido' });
+      await showAlert(`${mensajeIdTributarioInvalido()} Corrígelo antes de enviar.`, { icon: '⚠️', title: 'ID Tributario inválido' });
       rutInput.focus();
       return;
     }
